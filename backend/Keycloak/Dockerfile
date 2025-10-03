@@ -1,31 +1,23 @@
-# Imagen base oficial de Keycloak (distribución Quarkus)
-FROM quay.io/keycloak/keycloak:25.0.6 as builder
+# Usamos la imagen oficial de Keycloak 26.4.0 con Quarkus
+FROM quay.io/keycloak/keycloak:26.4.0 as builder
 
-# Variables de entorno
+# Modo build: empaquetamos con las configuraciones necesarias
 ENV KC_DB=postgres
-ENV KC_HEALTH_ENABLED=true
-ENV KC_METRICS_ENABLED=true
 
-WORKDIR /opt/keycloak
-
-# Compilación de Keycloak con las configuraciones necesarias
 RUN /opt/keycloak/bin/kc.sh build
 
-# Etapa final
-FROM quay.io/keycloak/keycloak:25.0.6
+# Runtime
+FROM quay.io/keycloak/keycloak:26.4.0
 
-WORKDIR /opt/keycloak
+ENV KC_DB=postgres
+ENV KC_HTTP_PORT=8080
+ENV KC_HOSTNAME_STRICT=false
+ENV KC_HOSTNAME_STRICT_HTTPS=false
 
+# Copiar lo que se construyó en la etapa anterior
 COPY --from=builder /opt/keycloak/ /opt/keycloak/
 
-# Render define la variable de entorno PORT automáticamente (por defecto 10000)
-# Aquí nos aseguramos de que Keycloak escuche en ese puerto
-ENV PORT=10000
-ENV KC_HTTP_PORT=${PORT}
-ENV KC_HTTP_HOST=0.0.0.0
+# Exponer el puerto que Render asignará
+EXPOSE 8080
 
-# Exponer el puerto dinámico
-EXPOSE ${PORT}
-
-# Comando de arranque
-ENTRYPOINT ["/opt/keycloak/bin/kc.sh", "start", "--http-port=${PORT}", "--http-host=0.0.0.0"]
+ENTRYPOINT ["/opt/keycloak/bin/kc.sh", "start", "--optimized"]
