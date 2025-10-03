@@ -20,4 +20,4 @@ COPY --from=builder /opt/keycloak/ /opt/keycloak/
 # Exponer el puerto que Render asignará
 EXPOSE 8080
 
-ENTRYPOINT ["/opt/keycloak/bin/kc.sh", "start", "--optimized", "--http-enabled=true", "--proxy=edge", "--hostname-strict=false", "--hostname-strict-https=false"]
+ENTRYPOINT ["/opt/keycloak/bin/kc.sh", "start", "--optimized", "--http-enabled=true", "--proxy-headers=xforwarded", "--hostname-strict=false", "--hostname-strict-https=false"]
