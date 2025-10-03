@@ -8,8 +8,7 @@ ENV JAVA_OPTS="-Xms256m -Xmx512m"
 ENV KC_BOOTSTRAP_ADMIN_USERNAME=admin
 ENV KC_BOOTSTRAP_ADMIN_PASSWORD=admin123
 
-# Puerto dinámico asignado por Render
-ENV KC_HTTP_PORT=${PORT}
-
-# Arrancamos Keycloak en modo desarrollo
-ENTRYPOINT ["/opt/keycloak/bin/kc.sh", "start-dev", "--http-port", "${KC_HTTP_PORT}"]
+# Render asigna un puerto dinámico en $PORT
+# No necesitas crear KC_HTTP_PORT
+# Solo usas directamente $PORT
+ENTRYPOINT ["/opt/keycloak/bin/kc.sh", "start-dev", "--http-port", "0.0.0.0:${PORT}"]
