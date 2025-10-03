@@ -1,5 +1,5 @@
 # Imagen base oficial de Keycloak (distribución Quarkus)
-FROM quay.io/keycloak/keycloak:25.0.6 as builder
+FROM quay.io/keycloak/keycloak:26.4.0 as builder
 
 # Variables de entorno
 ENV KC_DB=postgres
@@ -12,7 +12,7 @@ WORKDIR /opt/keycloak
 RUN /opt/keycloak/bin/kc.sh build
 
 # Etapa final
-FROM quay.io/keycloak/keycloak:25.0.6
+FROM quay.io/keycloak/keycloak:26.4.0
 
 WORKDIR /opt/keycloak
 
