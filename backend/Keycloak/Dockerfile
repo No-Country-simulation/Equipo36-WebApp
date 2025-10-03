@@ -1,5 +1,5 @@
 # Usamos la imagen oficial de Keycloak
-FROM quay.io/keycloak/keycloak:25.0.3
+FROM quay.io/keycloak/keycloak
 
 # Puerto en el que escucha Keycloak
 EXPOSE 8080
