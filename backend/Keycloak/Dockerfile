@@ -8,4 +8,4 @@ ENV JAVA_OPTS="-Xms256m -Xmx512m"
 ENV KC_HTTP_PORT=${PORT}
 
 # Instrucciones para arrancar Keycloak en modo dev
-ENTRYPOINT ["/opt/keycloak/bin/kc.sh", "start-dev", "--http-port", "${KC_HTTP_PORT}"]
+ENTRYPOINT /opt/keycloak/bin/kc.sh start-dev --http-port $KC_HTTP_PORT
