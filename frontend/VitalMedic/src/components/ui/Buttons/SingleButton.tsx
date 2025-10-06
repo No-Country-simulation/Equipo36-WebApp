@@ -1,11 +1,6 @@
 import { cn } from "clsx-for-tailwind";
 import type { ReactNode } from "react";
 
-/**
- * @interface Props
- * @description Define las propiedades únicas y heredadas aceptadas por el componente Button.
- * Extiende todas las propiedades de un botón HTML nativo (`<button>`).
- */
 interface Props {
   /**
    * Define la apariencia visual preestablecida del botón.
