@@ -3,7 +3,7 @@ services:
     image: postgres:16
     container_name: db-vitalmedic
     env_file:
-      - ../.env
+      - .env
     environment:
       POSTGRES_DB: ${DB_DATABASE}
       POSTGRES_USER: ${DB_USERNAME}
@@ -22,7 +22,7 @@ services:
     depends_on:
       - postgres
     env_file:
-      - ../.env
+      - .env
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USER}
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
@@ -43,7 +43,7 @@ services:
       - "8085:8080"
     volumes:
       - ../realms/VitalMedic-realm.json:/opt/keycloak/data/import/VitalMedic-realm.json
-      - ../realms/custom-event-listener.jar:/opt/keycloak/providers/custom-event-listener.jar
+      - ../extensions/custom-event-listener.jar:/opt/keycloak/providers/custom-event-listener.jar
     command:
       - start-dev
       - --import-realm
