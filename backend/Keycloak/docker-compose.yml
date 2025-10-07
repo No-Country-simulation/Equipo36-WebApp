@@ -1,0 +1,15 @@
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.4.0
+    container_name: keycloak-dev
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USER}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      WEBHOOK_URL: ${KEYCLOAK_WEBHOOK_URL}
+      WEBHOOK_CLIENT_ID: ${WEBHOOK_CLIENT_ID}
+      WEBHOOK_CLIENT_SECRET: ${WEBHOOK_CLIENT_SECRET}
+      WEBHOOK_REALM: ${WEBHOOK_REALM}
+      KEYCLOAK_BASE_URL: ${KEYCLOAK_BASE_URL}
+    ports:
+      - "8085:8080"
+    command: start-dev
