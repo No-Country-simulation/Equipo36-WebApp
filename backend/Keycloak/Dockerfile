@@ -7,7 +7,7 @@ ENV KC_HEALTH_ENABLED=true
 ENV KC_HTTP_ENABLED=true
 
 # Copiar custom-event-listener.jar al directorio de providers
-COPY ../VitalMedic/src/custom-event-listener.jar /opt/keycloak/providers/
+COPY custom-event-listener.jar /opt/keycloak/providers/
 
 # Construir Keycloak con el provider incluido
 RUN /opt/keycloak/bin/kc.sh build
