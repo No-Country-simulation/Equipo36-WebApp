@@ -1,0 +1,59 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: db-vitalmedic
+    env_file:
+      - ../.env
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - vitalmedic-network
+    restart: unless-stopped
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.4.0
+    container_name: keycloak-dev
+    depends_on:
+      - postgres
+    env_file:
+      - ../.env
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USER}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+
+      # Configuración para usar PostgreSQL
+      KC_DB: postgres
+      KC_DB_URL_HOST: postgres
+      KC_DB_URL_DATABASE: ${DB_DATABASE}
+      KC_DB_USERNAME: ${DB_USERNAME}
+      KC_DB_PASSWORD: ${DB_PASSWORD}
+      KC_DB_SCHEMA: public
+
+      #Variables personalizadas
+      WEBHOOK_URL: ${KEYCLOAK_WEBHOOK_URL}
+      WEBHOOK_REALM: ${KEYCLOAK_WEBHOOK_REALM}
+      KEYCLOAK_BASE_URL: ${KEYCLOAK_BASE_URL}
+    ports:
+      - "8085:8080"
+    volumes:
+      - ../realms/VitalMedic-realm.json:/opt/keycloak/data/import/VitalMedic-realm.json
+      - ../realms/custom-event-listener.jar:/opt/keycloak/providers/custom-event-listener.jar
+    command:
+      - start-dev
+      - --import-realm
+    networks:
+      - vitalmedic-network
+
+volumes:
+  postgres_data:
+    name: vitalmedic_postgres_data
+
+networks:
+  vitalmedic-network:
+    driver: bridge
