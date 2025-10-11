@@ -21,8 +21,8 @@ public class KeycloakWebhookController {
     @KeycloakWebhookEndpointDoc
     @PostMapping("/webhook")
     public ResponseEntity<String> handleEvent(@RequestBody PayloadDto payloadDto) {
-        userService.create(payloadDto);
+        userService.syncUserFromKeycloak(payloadDto);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body("Usuario Registrado");
+                .body("Sincronización exitosa");
     }
 }

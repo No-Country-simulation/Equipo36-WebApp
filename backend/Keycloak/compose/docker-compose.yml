@@ -42,8 +42,8 @@ services:
     ports:
       - "8085:8080"
     volumes:
-      - ../realms/VitalMedic-realm.json:/opt/keycloak/data/import/VitalMedic-realm.json
-      - ../extensions/custom-event-listener.jar:/opt/keycloak/providers/custom-event-listener.jar
+      - ../VitalMedic-realm.json:/opt/keycloak/data/import/VitalMedic-realm.json
+      - ../custom-event-listener.jar:/opt/keycloak/providers/custom-event-listener.jar
     command:
       - start-dev
       - --import-realm

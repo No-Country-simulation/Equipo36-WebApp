@@ -5,8 +5,7 @@ import java.util.UUID;
 public record PayloadDto(
         UUID id,
         String email,
-        String username,
-        String firstName,
-        String lastName
+        String username
+
 ) {
 }

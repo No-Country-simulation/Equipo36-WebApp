@@ -1,9 +1,7 @@
 package com.vitalmedic.VitalMedic.domain.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.vitalmedic.VitalMedic.domain.enums.Role;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -17,7 +15,9 @@ import java.util.UUID;
 @Entity
 @Table(name = "users")
 public class User {
+
     @Id
+    @GeneratedValue(generator = "UUID")
     @Column(nullable = false, updatable = false)
     private UUID id;
 
@@ -27,11 +27,12 @@ public class User {
     @Column(nullable = false, unique = true, length = 100)
     private String username;
 
-    @Column(length = 100)
-    private String firstName;
+    @Column(unique = true)
+    private UUID keycloakId;
 
-    @Column(length = 100)
-    private String lastName;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
@@ -39,4 +40,5 @@ public class User {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
 }

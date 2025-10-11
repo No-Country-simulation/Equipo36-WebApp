@@ -30,7 +30,8 @@ public class SecurityConfig {
                                 "/swagger-ui",
                                 "/swagger-ui.html",
                                 "/v3/api-docs",
-                                "/v3/api-docs/**").permitAll()
+                                "/v3/api-docs/**",
+                                "/api/admin/create-doctor").permitAll()
                         .requestMatchers("/api/keycloak/webhook").authenticated()
                         .anyRequest().authenticated()
                 )
