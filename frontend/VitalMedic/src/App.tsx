@@ -1,16 +1,37 @@
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter, type RouteObject } from "react-router";
 import { RouterProvider } from "react-router/dom";
-import LogIn from "./pages/auth/LogIn";
-import SignIn from "./pages/auth/SignIn";
+import BaseLayout from "./components/layout/BaseLayout";
+import DashboardLayout from "./components/layout/DashboardLayout";
+import AuthProvider from "./contexts/AuthProvider";
+import Inicio from "./pages/patient/Inicio";
+
+const patientRouter: RouteObject[] = [
+  {
+    index: true,
+    Component: Inicio,
+  },
+  { path: "mis-citas", element: <p>Mis citas</p> },
+  { path: "medicos", element: <p>médico</p> },
+  { path: "historial", element: <p>historial</p> },
+];
 
 const router = createBrowserRouter([
   {
     path: "/",
-    Component: SignIn,
-  },
-  {
-    path: "/login",
-    Component: LogIn,
+    Component: AuthProvider,
+    children: [
+      { index: true, element: <p>Debe iniciar sesión</p> },
+      {
+        Component: BaseLayout,
+        children: [
+          {
+            path: "dashboard",
+            Component: DashboardLayout,
+            children: [{ path: "patient", children: patientRouter }],
+          },
+        ],
+      },
+    ],
   },
 ]);
 
