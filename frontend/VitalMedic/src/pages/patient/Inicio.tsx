@@ -2,6 +2,7 @@ import { useNavigate } from "react-router";
 import Banner from "../../components/ui/Banner";
 import ActionCard from "../../components/ui/Card/ActionCard";
 import SingleButton from "../../components/ui/Buttons/SingleButton";
+import ActiveCallBanner from "../../components/ui/ActiveCallBanner";
 import { useAuth } from "../../hooks/useAuth";
 
 const Inicio = () => {
@@ -28,6 +29,14 @@ const Inicio = () => {
       >
         Tu salud es nuestra prioridad
       </Banner>
+
+      {/* Banner de Consulta Virtual Activa - Solo se muestra si hay una consulta */}
+      <ActiveCallBanner
+        appointmentId="VM1"
+        doctorName="Dr. Roberto Silva"
+        timeRemaining="10 minutos"
+        className="mb-4"
+      />
 
       {/* Grid de contenido principal - Responsive */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 md:gap-6">

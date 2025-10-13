@@ -5,6 +5,9 @@ import DashboardLayout from "./components/layout/DashboardLayout";
 import AuthProvider from "./contexts/AuthProvider";
 import Inicio from "./pages/patient/Inicio";
 import AgendarCita from "./pages/patient/AgendarCita";
+import HistorialMedico from "./pages/patient/HistorialMedico";
+import Configuracion from "./pages/patient/Configuracion";
+import SalaEspera from "./pages/patient/SalaEspera";
 
 const patientRouter: RouteObject[] = [
   {
@@ -13,9 +16,10 @@ const patientRouter: RouteObject[] = [
   },
   { path: "mis-citas", element: <p>Mis citas</p> },
   { path: "medicos", element: <p>médico</p> },
-  { path: "historial", element: <p>historial</p> },
-  { path: "configuracion", element: <p>Configuración</p> },
+  { path: "historial", Component: HistorialMedico },
+  { path: "configuracion", Component: Configuracion },
   { path: "agendar-cita", Component: AgendarCita },
+  { path: "sala-espera/:appointmentId", Component: SalaEspera },
 ];
 
 const router = createBrowserRouter([

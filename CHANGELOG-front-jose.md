@@ -32,7 +32,7 @@ Este reporte documenta las mejoras significativas implementadas en la aplicació
 - `frontend/VitalMedic/public/vital-logo.svg` (nuevo)
 - `frontend/VitalMedic/src/assets/icons/Vital.svg` (nuevo)
 
-### 👤 Avatar con Iniciales (Sin imagen fea)
+### 👤 Avatar con Iniciales y no imagen
 - ✅ **Avatar mejorado**: Reemplazado imagen por iniciales del usuario
 - ✅ **Gradiente moderno**: Fondo degradado azul-púrpura
 - ✅ **Responsive**: Tamaños adaptativos según dispositivo
