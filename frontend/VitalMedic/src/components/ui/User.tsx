@@ -2,7 +2,7 @@ import { cn } from "clsx-for-tailwind";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import perfil from "../../assets/images/perfil.jpg";
-import { useAuth } from "../../hooks/useAuth";
+import { useAppSelector } from "../../hooks/reduxHooks";
 import SingleButton from "./Buttons/SingleButton";
 
 interface Props {
@@ -15,7 +15,7 @@ const User = ({ firstName, lastName, profilePhoto = perfil, email }: Props) => {
   const [showPanel, setShowPanel] = useState(false);
 
   const navigate = useNavigate();
-  const { keycloak } = useAuth();
+  const keycloak = useAppSelector((state) => state.auth.keycloak);
 
   const handleButtonShowPanel = () => {
     setShowPanel(!showPanel);
@@ -23,8 +23,8 @@ const User = ({ firstName, lastName, profilePhoto = perfil, email }: Props) => {
 
   const handleButtonLogout = async () => {
     try {
-      navigate("/");
       await keycloak?.logout();
+      navigate("/");
     } catch {
       console.error("Algo va mal");
     }
@@ -34,7 +34,7 @@ const User = ({ firstName, lastName, profilePhoto = perfil, email }: Props) => {
     <div
       className={cn(
         "absolute top-14 right-0",
-        "w-72 min-h-20 px-2.5 py-3.5",
+        "w-72 min-h-20 px-2.5 py-3.5 z-20",
         "bg-white rounded-sm",
         "inset-shadow-black/40 shadow-sm",
         "flex flex-col items-center gap-4",

@@ -24,14 +24,14 @@ const patientTab = [
 
 const DashboardLayout = () => {
   return (
-    <div className={cn("pt-2.5 px-10", "flex", "h-[calc(100svh_-_64px)]")}>
-      <SidebarLayout tabs={patientTab} />
-      <main className={cn("w-[calc(100%_-_240px)] h-full px-8")}>
-        <PrivateRoute>
+    <PrivateRoute>
+      <div className={cn("pt-2.5 px-10", "flex", "h-[calc(100svh_-_64px)]")}>
+        <SidebarLayout tabs={patientTab} />
+        <main className={cn("w-[calc(100%_-_240px)] h-full px-8")}>
           <Outlet />
-        </PrivateRoute>
-      </main>
-    </div>
+        </main>
+      </div>
+    </PrivateRoute>
   );
 };
 

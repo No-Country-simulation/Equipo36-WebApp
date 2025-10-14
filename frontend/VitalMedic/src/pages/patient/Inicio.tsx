@@ -1,10 +1,10 @@
 import { cn } from "clsx-for-tailwind";
 import Banner from "../../components/ui/Banner";
 import AppointmentCard from "../../components/ui/Card/AppointmentCard";
-import { useAuth } from "../../hooks/useAuth";
+import { useAppSelector } from "../../hooks/reduxHooks";
 
 const Inicio = () => {
-  const { userProfile } = useAuth();
+  const userProfile = useAppSelector((state) => state.auth.userProfile);
 
   return (
     <>
