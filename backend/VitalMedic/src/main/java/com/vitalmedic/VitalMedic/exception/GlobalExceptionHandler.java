@@ -20,10 +20,65 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(FhirConnectionException.class)
+    public ResponseEntity<ErrorResponse> handleFhirConnectionException(FhirConnectionException ex, HttpServletRequest request) {
+        log.error("❌ Error de conexión con FHIR en {}: {}", request.getRequestURI(), ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.SERVICE_UNAVAILABLE.value(),
+                "FHIR_CONNECTION_ERROR",
+                "Error al conectar con el servidor FHIR",
+                List.of(ex.getMessage()),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponse);
+    }
+
+    @ExceptionHandler(InvalidOnboardingStepException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidOnboardingStepException(InvalidOnboardingStepException ex, HttpServletRequest request) {
+        log.warn("⚠️ Paso de onboarding inválido en {}: {}", request.getRequestURI(), ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.FORBIDDEN.value(),
+                "INVALID_ONBOARDING_STEP",
+                "Acción no permitida en esta etapa del onboarding",
+                List.of(ex.getMessage()),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    }
+
+    @ExceptionHandler(ResourceAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleResourceAlreadyExistsException(ResourceAlreadyExistsException ex, HttpServletRequest request) {
+        log.warn("⚠️ Recurso duplicado en {}: {}", request.getRequestURI(), ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                "RESOURCE_ALREADY_EXISTS",
+                "El recurso ya existe",
+                List.of(ex.getMessage()),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException ex, HttpServletRequest request) {
+        log.warn("⚠️ Recurso no encontrado en {}: {}", request.getRequestURI(), ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.NOT_FOUND.value(),
+                "RESOURCE_NOT_FOUND",
+                "El recurso solicitado no fue encontrado",
+                List.of(ex.getMessage()),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    // -----------------------------------------------------------------------
+    // 🔹 Manejadores existentes
+    // -----------------------------------------------------------------------
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex, HttpServletRequest request) {
         log.error("💥 Error no controlado en {}: {}", request.getRequestURI(), ex.getMessage(), ex);
-
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "INTERNAL_SERVER_ERROR",
@@ -69,7 +124,6 @@ public class GlobalExceptionHandler {
             DataIntegrityViolationException ex, HttpServletRequest request) {
 
         String rootMessage = ex.getRootCause() != null ? ex.getRootCause().getMessage() : ex.getMessage();
-
         String userFriendlyMessage = "Valor duplicado detectado";
         List<String> details = List.of(rootMessage);
 
