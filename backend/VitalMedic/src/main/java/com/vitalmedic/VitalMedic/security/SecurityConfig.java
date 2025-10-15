@@ -31,6 +31,7 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/v3/api-docs",
                                 "/v3/api-docs/**",
+                                "/redoc.html",
                                 "/api/admin/create-doctor",
                                 "/api/enums/identifier-systems").permitAll()
                         .anyRequest().authenticated()

@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "ADMIN")
+@Tag(name = "Administrador")
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor

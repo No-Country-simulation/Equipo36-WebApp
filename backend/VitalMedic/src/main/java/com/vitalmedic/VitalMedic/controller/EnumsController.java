@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Tag(name ="ENUM")
+@Tag(name ="Enum")
 @RestController
 @RequestMapping("/api/enums")
 @RequiredArgsConstructor

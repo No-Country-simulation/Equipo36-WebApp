@@ -28,8 +28,7 @@ import java.lang.annotation.*;
         ⚠️ Este endpoint está diseñado para ser llamado **únicamente desde Keycloak**, 
         no requiere autenticación de cliente externo.
         """,
-        security = @SecurityRequirement(name = "bearerAuth"),
-        tags = {"Keycloak Webhook"}
+        security = @SecurityRequirement(name = "bearerAuth")
 )
 @ApiResponses(value = {
         @ApiResponse(
