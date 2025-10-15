@@ -17,6 +17,15 @@ public enum IdentifierSystem {
         this.displayName = displayName;
     }
 
+    public static String getSystemUrlById(String id) {
+        for (IdentifierSystem system : values()) {
+            if (system.name().equalsIgnoreCase(id)) {
+                return system.getSystemUrl();
+            }
+        }
+        throw new IllegalArgumentException("IdentifierSystem no encontrado: " + id);
+    }
+
     public String getSystemUrl() {
         return systemUrl;
     }

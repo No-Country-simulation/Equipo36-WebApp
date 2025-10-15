@@ -1,9 +1,11 @@
 package com.vitalmedic.VitalMedic.service.impl;
 
 import com.vitalmedic.VitalMedic.domain.dto.keycloak.PayloadDto;
+import com.vitalmedic.VitalMedic.domain.entity.PatientEntity;
 import com.vitalmedic.VitalMedic.domain.entity.User;
 import com.vitalmedic.VitalMedic.domain.enums.Role;
 import com.vitalmedic.VitalMedic.domain.mapper.UserMapper;
+import com.vitalmedic.VitalMedic.repository.PatientRepository;
 import com.vitalmedic.VitalMedic.repository.UserRepository;
 import com.vitalmedic.VitalMedic.service.KeycloakAuthService;
 import com.vitalmedic.VitalMedic.service.UserService;
@@ -18,6 +20,8 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PatientRepository patientRepository;
+
     private final UserMapper userMapper;
 
     private final KeycloakAuthService keycloakAuthService;
@@ -31,6 +35,11 @@ public class UserServiceImpl implements UserService {
             User newUser = userMapper.toUser(payload);
             newUser.setRole(Role.PATIENT);
             userRepository.save(newUser);
+
+            PatientEntity patient = new PatientEntity();
+            patient.setUser(newUser);
+            patientRepository.save(patient);
+
             keycloakAuthService.assignRoleToExistingUser(payload.id().toString(),Role.ONBOARDING_PENDING.name()).block();
 
         }

@@ -4,14 +4,11 @@ import com.vitalmedic.VitalMedic.domain.enums.IdentifierSystem;
 import jakarta.persistence.*;
 import lombok.*;
 
+@NoArgsConstructor
+@Data
 @Entity
 @Table(name = "patient_identifiers")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class PatientIdentifier {
+public class PatientIdentifierEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +23,6 @@ public class PatientIdentifier {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id")
-    private Patient patient;
+    private PatientEntity patient;
 }
 

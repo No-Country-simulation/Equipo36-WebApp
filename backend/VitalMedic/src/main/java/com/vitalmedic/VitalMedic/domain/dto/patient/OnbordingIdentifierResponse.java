@@ -1,7 +1,9 @@
 package com.vitalmedic.VitalMedic.domain.dto.patient;
 
+import com.vitalmedic.VitalMedic.domain.dto.fhir.PatientFhirResponse;
+
 public record OnbordingIdentifierResponse(
         boolean foundInFhir,
-        org.hl7.fhir.r4.model.Patient patientFhir
+        PatientFhirResponse patientFhir
 ) {
 }

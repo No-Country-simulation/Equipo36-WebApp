@@ -1,9 +1,12 @@
 package com.vitalmedic.VitalMedic.domain.entity;
 
+import com.vitalmedic.VitalMedic.domain.enums.Gender;
+import com.vitalmedic.VitalMedic.domain.enums.OnboardingStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -11,10 +14,9 @@ import java.util.UUID;
 @Data
 @Entity
 @Table(name = "patients")
-public class Patient {
+public class PatientEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;
 
     @Column(length = 100)
@@ -23,29 +25,28 @@ public class Patient {
     @Column(length = 100)
     private String lastName;
 
+    private LocalDate birthDate;
+
+    @Enumerated(EnumType.STRING)
+    Gender gender;
+
     @Column(length = 20)
     private String phone;
 
     private String address;
 
-    @Column(length = 5)
-    private String bloodType;
-
-    @Column(columnDefinition = "TEXT")
-    private String allergies;
-
-    @Column(columnDefinition = "TEXT")
-    private String medicalConditions;
+    @Enumerated(EnumType.STRING)
+    private OnboardingStatus onboardingStatus = OnboardingStatus.PENDING_IDENTIFIER;
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PatientIdentifier> identifiers;
+    private List<PatientIdentifierEntity> identifiers;
 
+    private Boolean importedFromFhir;
     private String fhirId;
 
     @OneToOne
     @MapsId
     @JoinColumn(name = "id")
     private User user;
-
 
 }

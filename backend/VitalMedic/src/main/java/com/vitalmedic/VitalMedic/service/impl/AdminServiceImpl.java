@@ -1,7 +1,8 @@
 package com.vitalmedic.VitalMedic.service.impl;
 
 import com.vitalmedic.VitalMedic.domain.dto.admin.RegisterDoctorRequest;
-import com.vitalmedic.VitalMedic.domain.entity.Doctor;
+import com.vitalmedic.VitalMedic.domain.dto.admin.RegisterDoctorResponse;
+import com.vitalmedic.VitalMedic.domain.entity.DoctorEntity;
 import com.vitalmedic.VitalMedic.domain.entity.User;
 import com.vitalmedic.VitalMedic.domain.enums.Role;
 import com.vitalmedic.VitalMedic.domain.mapper.DoctorMapper;
@@ -30,16 +31,16 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional
-    public void createDoctor(RegisterDoctorRequest request) {
+    public RegisterDoctorResponse createDoctor(RegisterDoctorRequest request) {
 
         User user = userMapper.toUser(request);
         user.setRole(Role.DOCTOR);
         user.setUsername(request.email());
         userRepository.save(user);
 
-        Doctor doctor = doctorMapper.toDoctor(request);
-        doctor.setUser(user);
-        doctorRepository.save(doctor);
+        DoctorEntity doctorEntity = doctorMapper.toDoctor(request);
+        doctorEntity.setUser(user);
+        doctorRepository.save(doctorEntity);
 
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
@@ -47,6 +48,8 @@ public class AdminServiceImpl implements AdminService {
                 keycloakAuthService.createUser(user).block();
             }
         });
+
+        return doctorMapper.toRegisterDoctorResponse(doctorEntity);
 
     }
 

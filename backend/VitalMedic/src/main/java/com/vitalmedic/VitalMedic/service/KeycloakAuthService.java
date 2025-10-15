@@ -10,4 +10,6 @@ public interface KeycloakAuthService {
     Mono<UserResponse> createUser(User user);
 
     Mono<Void> assignRoleToExistingUser(String userId, String roleName);
+
+    Mono<Void> removeRoleFromUser(String keycloakId, String roleName);
 }

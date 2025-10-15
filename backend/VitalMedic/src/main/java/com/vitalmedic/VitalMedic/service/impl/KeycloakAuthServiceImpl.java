@@ -63,12 +63,28 @@ public class KeycloakAuthServiceImpl implements KeycloakAuthService {
      * Usado desde el listener de eventos de creación de usuario.
      */
     @Override
-    public Mono<Void> assignRoleToExistingUser(String userId, String roleName) {
+    public Mono<Void> assignRoleToExistingUser(String keycloadId, String roleName) {
         return getAccessToken()
                 .flatMap(token -> {
                     WebClient client = buildClient(token);
                     return getRole(client, roleName)
-                            .flatMap(roleMap -> assignRoleToUser(client, userId, roleMap));
+                            .flatMap(roleMap -> assignRoleToUser(client, keycloadId, roleMap));
+                });
+    }
+
+    @Override
+    public Mono<Void> removeRoleFromUser(String keycloakId, String roleName) {
+        return getAccessToken()
+                .flatMap(token -> {
+                    WebClient client = buildClient(token);
+                    return getRole(client, roleName)
+                            .flatMap(roleMap -> client.method(org.springframework.http.HttpMethod.DELETE)
+                                    .uri("/admin/realms/{realm}/users/{userId}/role-mappings/realm", realm, keycloakId)
+                                    .bodyValue(new Object[]{roleMap})
+                                    .retrieve()
+                                    .toBodilessEntity()
+                                    .then()
+                            );
                 });
     }
 

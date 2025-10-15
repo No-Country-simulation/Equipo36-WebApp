@@ -31,8 +31,8 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/v3/api-docs",
                                 "/v3/api-docs/**",
-                                "/api/admin/create-doctor").permitAll()
-                        .requestMatchers("/api/keycloak/webhook").authenticated()
+                                "/api/admin/create-doctor",
+                                "/api/enums/identifier-systems").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt ->
