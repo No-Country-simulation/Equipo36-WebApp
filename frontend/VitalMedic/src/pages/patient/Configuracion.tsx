@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { cn } from "clsx-for-tailwind";
-import { useAuth } from "../../hooks/useAuth";
+import { useAppSelector } from "../../hooks/reduxHooks";
 import SingleButton from "../../components/ui/Buttons/SingleButton";
 import FormField, { FormSection } from "../../components/ui/Form/FormField";
 
@@ -40,7 +40,7 @@ interface AppPreferences {
 }
 
 const Configuracion = () => {
-  const { userProfile } = useAuth();
+  const userProfile = useAppSelector((state) => state.auth.userProfile);
   const [activeTab, setActiveTab] = useState("personal");
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
