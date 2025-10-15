@@ -40,7 +40,18 @@ const StartKeycloak = () => {
             }),
           );
 
-          navigate("/dashboard/patient/");
+          // Redirigir según el rol del usuario
+          const realmRoles = keycloakClient.realmAccess?.roles || [];
+          const clientRoles = keycloakClient.resourceAccess?.['vitalmedic-frontend']?.roles || [];
+          const allRoles = [...realmRoles, ...clientRoles];
+
+          if (allRoles.includes('admin') || allRoles.includes('ADMIN')) {
+            navigate("/dashboard/admin/");
+          } else if (allRoles.includes('doctor') || allRoles.includes('DOCTOR')) {
+            navigate("/dashboard/doctor/");
+          } else {
+            navigate("/dashboard/patient/");
+          }
         }
       } catch (error) {
         console.error("Error fatal al inicializar Keycloak", error);
