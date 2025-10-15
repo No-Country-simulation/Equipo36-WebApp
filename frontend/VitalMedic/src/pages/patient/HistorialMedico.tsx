@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { cn } from "clsx-for-tailwind";
-import { useAuth } from "../../hooks/useAuth";
+import { useAppSelector } from "../../hooks/reduxHooks";
 import SingleButton from "../../components/ui/Buttons/SingleButton";
 import ConsultaCard from "../../components/ui/Card/ConsultaCard";
 import InfoSection from "../../components/ui/Card/InfoSection";
 
 const HistorialMedico = () => {
-  const { userProfile } = useAuth();
+  const userProfile = useAppSelector((state) => state.auth.userProfile);
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("personal");
 
