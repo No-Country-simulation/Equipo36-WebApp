@@ -3,10 +3,10 @@ import Banner from "../../components/ui/Banner";
 import ActionCard from "../../components/ui/Card/ActionCard";
 import SingleButton from "../../components/ui/Buttons/SingleButton";
 import ActiveCallBanner from "../../components/ui/ActiveCallBanner";
-import { useAuth } from "../../hooks/useAuth";
+import { useAppSelector } from "../../hooks/reduxHooks";
 
 const Inicio = () => {
-  const { userProfile } = useAuth();
+  const userProfile = useAppSelector((state) => state.auth.userProfile);
   const navigate = useNavigate();
 
   const handleAgendarCita = () => {

@@ -1,9 +1,9 @@
 import { cn } from "clsx-for-tailwind";
-import { useAuth } from "../../hooks/useAuth";
+import { useAppSelector } from "../../hooks/reduxHooks";
 import User from "../ui/User";
 
 const Header = () => {
-  const { userProfile } = useAuth();
+  const userProfile = useAppSelector((state) => state.auth.userProfile);
 
   return (
     <header

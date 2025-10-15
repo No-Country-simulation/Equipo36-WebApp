@@ -1,7 +1,7 @@
 import { cn } from "clsx-for-tailwind";
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { useAuth } from "../../hooks/useAuth";
+import { useAppSelector } from "../../hooks/reduxHooks";
 import SingleButton from "./Buttons/SingleButton";
 
 interface Props {
@@ -14,7 +14,7 @@ const User = ({ firstName, lastName, email }: Props) => {
   const [showPanel, setShowPanel] = useState(false);
 
   const navigate = useNavigate();
-  const { keycloak } = useAuth();
+  const keycloak = useAppSelector((state) => state.auth.keycloak);
 
   const handleButtonShowPanel = () => {
     setShowPanel(!showPanel);
@@ -22,8 +22,8 @@ const User = ({ firstName, lastName, email }: Props) => {
 
   const handleButtonLogout = async () => {
     try {
-      navigate("/");
       await keycloak?.logout();
+      navigate("/");
     } catch {
       console.error("Algo va mal");
     }

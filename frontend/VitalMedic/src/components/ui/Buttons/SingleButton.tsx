@@ -37,7 +37,9 @@ const SingleButton = ({
       className={cn(
         "py-2 px-4 min-w-[100px] h-10 border",
         "rounded-lg uppercase font-semibold text-[14px] transition-all duration-200",
-        !disabled && "shadow-md hover:-translate-y-0.5", // Estilos de interacción/sombra
+        "shadow-md hover:-translate-y-0.5", // Estilos de interacción/sombra
+        "flex justify-center items-center gap-1",
+        "active:scale-95",
         fullWidth && "w-full", // Toma el ancho total del padre
         disabled && "opacity-50 cursor-not-allowed", // Estilos para disabled
         {
