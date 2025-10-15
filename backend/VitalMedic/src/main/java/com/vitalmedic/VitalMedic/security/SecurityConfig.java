@@ -31,6 +31,10 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/v3/api-docs",
                                 "/v3/api-docs/**",
+                                "/api/admin/doctors/delete-doctor",
+                                "/api/admin/doctors/get-doctor",
+                                "/api/admin/doctors/get-all-doctors",
+                                "/api/admin/doctors/update-doctor",
                                 "/api/admin/create-doctor").permitAll()
                         .requestMatchers("/api/keycloak/webhook").authenticated()
                         .anyRequest().authenticated()
