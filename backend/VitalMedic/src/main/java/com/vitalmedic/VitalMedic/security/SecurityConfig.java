@@ -33,6 +33,7 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/redoc.html",
                                 "/api/admin/create-doctor",
+                                "/api/doctors/**",
                                 "/api/enums/identifier-systems").permitAll()
                         .anyRequest().authenticated()
                 )
