@@ -22,10 +22,13 @@ import com.vitalmedic.VitalMedic.service.FhirPatientService;
 import com.vitalmedic.VitalMedic.service.KeycloakAuthService;
 import com.vitalmedic.VitalMedic.service.PatientService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -188,6 +191,33 @@ public class PatientServiceImpl implements PatientService {
 
         return new OnboardingStatusResponse(patient.getOnboardingStatus().name());
     }
+
+    @Override
+    public PatientResponse getPatientById(UUID id) {
+        PatientEntity patient = patientRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Paciente no encontrado"));
+        return patientMapper.toPatientResponse(patient);
+    }
+
+    @Override
+    public Page<PatientResponse> getAllPatientsWithSearch(PatientSearchRequest request, Pageable pageable) {
+        Page<PatientEntity> patients = patientRepository.searchPatients(request.search(),pageable);
+        return patientMapper.toPatientResponse(patients);
+    }
+
+    @Override
+    public PatientResponse updatePatient(PatientRequest request){
+        User user = authService.getAuthenticatedUser();
+        PatientEntity patient = patientRepository.findByUser(user)
+                .orElseThrow(() -> new ResourceNotFoundException("Paciente no encontrado"));
+
+        patientMapper.updatePatient(request,patient);
+
+        patientRepository.save(patient);
+
+        return patientMapper.toPatientResponse(patient);
+    }
+
 
     /* ---------------------- Helpers ---------------------- */
     private void validateOnboardingStep(PatientEntity patient, OnboardingStatus expected) {

@@ -11,8 +11,13 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @Tag(name = "Paciente")
 @RestController
@@ -52,5 +57,26 @@ public class PatientController {
         OnboardingStatusResponse response = patientService.getOnbordingStatus();
         return ResponseEntity.ok(ApiResult.success(response, "Petición exitosa"));
     }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getPatienteById(@PathVariable UUID id){
+        PatientResponse response = patientService.getPatientById(id);
+        return ResponseEntity.ok(ApiResult.success(response,"Paciente encontrado"));
+    }
+    @SecurityRequirement(name = "bearerAuth")
+    @GetMapping
+    public ResponseEntity<?> getAllPatientsWithSearch(@ParameterObject @Valid PatientSearchRequest request, @ParameterObject Pageable pageable){
+        Page<PatientResponse> response = patientService.getAllPatientsWithSearch(request,pageable);
+        return ResponseEntity.ok(ApiResult.success(response,"Pacientes encontrados"));
+    }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @PutMapping
+    public ResponseEntity<?> updatePatient(@RequestBody @Valid PatientRequest request){
+        PatientResponse response = patientService.updatePatient(request);
+        return ResponseEntity.ok(ApiResult.success(response,"Paciente actualizado con exito"));
+    }
+
 
 }
