@@ -188,21 +188,21 @@ const UserManagement: React.FC = () => {
           <div className="account-card">
             <h4>👤 Paciente de Prueba</h4>
             <p><strong>Email:</strong> paciente@vitalmedic.com</p>
-            <p><strong>Password:</strong> patient123</p>
+            <p><strong>Password:</strong> [Configurar en Keycloak]</p>
             <p><strong>Acceso:</strong> Solo panel de paciente</p>
           </div>
           
           <div className="account-card">
             <h4>👨‍⚕️ Doctor de Prueba</h4>
             <p><strong>Email:</strong> doctor@vitalmedic.com</p>
-            <p><strong>Password:</strong> doctor123</p>
+            <p><strong>Password:</strong> [Configurar en Keycloak]</p>
             <p><strong>Acceso:</strong> Panel de doctor + paciente</p>
           </div>
           
           <div className="account-card">
             <h4>⚙️ Admin de Prueba</h4>
             <p><strong>Email:</strong> admin@vitalmedic.com</p>
-            <p><strong>Password:</strong> admin123</p>
+            <p><strong>Password:</strong> [Configurar en Keycloak]</p>
             <p><strong>Acceso:</strong> Todos los paneles</p>
           </div>
         </div>
