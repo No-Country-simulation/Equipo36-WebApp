@@ -43,3 +43,11 @@ Thumbs.db
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Docker files with credentials
+docker-compose.yml
+start-vitalmedic.ps1
+
+# Database files
+database_data.sql
+database_schema.sql
