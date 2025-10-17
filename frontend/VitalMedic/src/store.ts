@@ -4,9 +4,18 @@ import modalReducer from "./features/modal/modalSlice";
 
 export const store = configureStore({
   reducer: {
-    modal: modalReducer,
     auth: authReducer,
+    modal: modalReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        // Ignorar estas action types
+        ignoredActions: ["auth/setKeycloak", "auth/startAuth"],
+        // Ignorar estas field paths en el state
+        ignoredPaths: ["auth.keycloak"],
+      },
+    }),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

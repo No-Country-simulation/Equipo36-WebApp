@@ -42,15 +42,20 @@ const StartKeycloak = () => {
 
           // Redirigir según el rol del usuario
           const realmRoles = keycloakClient.realmAccess?.roles || [];
-          const clientRoles = keycloakClient.resourceAccess?.['vitalmedic-frontend']?.roles || [];
+          const clientRoles =
+            keycloakClient.resourceAccess?.["vitalmedic-frontend"]?.roles || [];
           const allRoles = [...realmRoles, ...clientRoles];
 
-          if (allRoles.includes('admin') || allRoles.includes('ADMIN')) {
+          if (allRoles.includes("admin") || allRoles.includes("ADMIN")) {
             navigate("/dashboard/admin/");
-          } else if (allRoles.includes('doctor') || allRoles.includes('DOCTOR')) {
+          } else if (
+            allRoles.includes("doctor") ||
+            allRoles.includes("DOCTOR")
+          ) {
             navigate("/dashboard/doctor/");
           } else {
-            navigate("/dashboard/patient/");
+            // Los pacientes van al onboarding primero
+            navigate("/onboarding");
           }
         }
       } catch (error) {

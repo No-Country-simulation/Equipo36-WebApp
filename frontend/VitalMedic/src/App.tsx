@@ -10,105 +10,106 @@ import AgendarCita from "./pages/patient/AgendarCita";
 import HistorialMedico from "./pages/patient/HistorialMedico";
 import Configuracion from "./pages/patient/Configuracion";
 import SalaEspera from "./pages/patient/SalaEspera";
-import Onboarding from "./pages/onboarding/Onboarding";
+import CompleteOnboarding from "./pages/onboarding/CompleteOnboarding";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import DoctorDashboard from "./pages/doctor/DoctorDashboard";
 import RoleSelector from "./components/common/RoleSelector";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AccessDenied from "./components/auth/AccessDenied";
+
 import { store } from "./store";
 
 const patientRouter: RouteObject[] = [
-  { 
-    index: true, 
+  {
+    index: true,
     element: (
-      <ProtectedRoute allowedRoles={['ADMIN', 'DOCTOR', 'PATIENT']}>
+      <ProtectedRoute allowedRoles={["ADMIN", "DOCTOR", "PATIENT"]}>
         <Inicio />
       </ProtectedRoute>
-    )
-  },
-  { 
-    path: "mis-citas", 
-    element: (
-      <ProtectedRoute allowedRoles={['ADMIN', 'DOCTOR', 'PATIENT']}>
-        <Appointment />
-      </ProtectedRoute>
-    )
-  },
-  { 
-    path: "medicos", 
-    element: (
-      <ProtectedRoute allowedRoles={['ADMIN', 'DOCTOR', 'PATIENT']}>
-        <p>médico</p>
-      </ProtectedRoute>
-    )
-  },
-  { 
-    path: "historial", 
-    element: (
-      <ProtectedRoute allowedRoles={['ADMIN', 'DOCTOR', 'PATIENT']}>
-        <HistorialMedico />
-      </ProtectedRoute>
-    )
-  },
-  { 
-    path: "configuracion", 
-    element: (
-      <ProtectedRoute allowedRoles={['ADMIN', 'DOCTOR', 'PATIENT']}>
-        <Configuracion />
-      </ProtectedRoute>
-    )
-  },
-  { 
-    path: "agendar-cita", 
-    element: (
-      <ProtectedRoute allowedRoles={['ADMIN', 'DOCTOR', 'PATIENT']}>
-        <AgendarCita />
-      </ProtectedRoute>
-    )
-  },
-  { 
-    path: "sala-espera/:appointmentId", 
-    element: (
-      <ProtectedRoute allowedRoles={['ADMIN', 'DOCTOR', 'PATIENT']}>
-        <SalaEspera />
-      </ProtectedRoute>
-    )
+    ),
   },
   {
-    path: 'access-denied',
-    element: <AccessDenied requiredRoles={['ADMIN', 'DOCTOR', 'PATIENT']} />
-  }
+    path: "mis-citas",
+    element: (
+      <ProtectedRoute allowedRoles={["ADMIN", "DOCTOR", "PATIENT"]}>
+        <Appointment />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "medicos",
+    element: (
+      <ProtectedRoute allowedRoles={["ADMIN", "DOCTOR", "PATIENT"]}>
+        <p>médico</p>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "historial",
+    element: (
+      <ProtectedRoute allowedRoles={["ADMIN", "DOCTOR", "PATIENT"]}>
+        <HistorialMedico />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "configuracion",
+    element: (
+      <ProtectedRoute allowedRoles={["ADMIN", "DOCTOR", "PATIENT"]}>
+        <Configuracion />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "agendar-cita",
+    element: (
+      <ProtectedRoute allowedRoles={["ADMIN", "DOCTOR", "PATIENT"]}>
+        <AgendarCita />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "sala-espera/:appointmentId",
+    element: (
+      <ProtectedRoute allowedRoles={["ADMIN", "DOCTOR", "PATIENT"]}>
+        <SalaEspera />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "access-denied",
+    element: <AccessDenied requiredRoles={["ADMIN", "DOCTOR", "PATIENT"]} />,
+  },
 ];
 
 const adminRouter: RouteObject[] = [
-  { 
-    index: true, 
+  {
+    index: true,
     element: (
-      <ProtectedRoute allowedRoles={['ADMIN']}>
+      <ProtectedRoute allowedRoles={["ADMIN"]}>
         <AdminDashboard />
       </ProtectedRoute>
-    )
+    ),
   },
   {
-    path: 'access-denied',
-    element: <AccessDenied requiredRoles={['ADMIN']} />
-  }
+    path: "access-denied",
+    element: <AccessDenied requiredRoles={["ADMIN"]} />,
+  },
 ];
 
 const doctorRouter: RouteObject[] = [
-  { 
-    index: true, 
+  {
+    index: true,
     element: (
-      <ProtectedRoute allowedRoles={['ADMIN', 'DOCTOR']}>
+      <ProtectedRoute allowedRoles={["ADMIN", "DOCTOR"]}>
         <DoctorDashboard />
       </ProtectedRoute>
-    )
+    ),
   },
   {
-    path: 'access-denied',
-    element: <AccessDenied requiredRoles={['ADMIN', 'DOCTOR']} />
-  }
+    path: "access-denied",
+    element: <AccessDenied requiredRoles={["ADMIN", "DOCTOR"]} />,
+  },
 ];
 
 const router = createBrowserRouter([
@@ -122,7 +123,7 @@ const router = createBrowserRouter([
       },
       {
         path: "onboarding",
-        Component: Onboarding,
+        Component: CompleteOnboarding,
       },
       {
         Component: BaseLayout,
@@ -131,7 +132,7 @@ const router = createBrowserRouter([
             path: "dashboard",
             children: [
               { index: true, Component: RoleSelector },
-              { 
+              {
                 Component: DashboardLayout,
                 children: [
                   { path: "patient", children: patientRouter },
