@@ -8,6 +8,7 @@ const Dia = ({ dia, indice, esHoy, tipoCita }: DiaProps) => (
       "w-11 h-12 p-2 ",
       "text-center text-lg font-semibold cursor-pointer",
       "rounded-lg transition-colors",
+      "max-[520px]:w-8 max-[520px]:h-8 max-[520px]:text-sm",
       // Estilo para celdas vacías
       dia === null && "invisible",
       // Estilo general para celdas con número
@@ -17,7 +18,7 @@ const Dia = ({ dia, indice, esHoy, tipoCita }: DiaProps) => (
       // Estilo para los fines de semana (opcional: si el índice es 0 (Dom) o 6 (Sáb))
       (indice % 7 === 0 || indice % 7 === 6) && !esHoy && "text-red-500",
       // Estilo para día con citas precenciales
-      tipoCita === "precencial" && "bg-blue-500 text-white hover:bg-blue-600",
+      tipoCita === "precencial" && "bg-green-500 text-white hover:bg-green-600",
       // Estilo para dias con citas virtuales
       tipoCita === "virtual" && "bg-purple-500 text-white hover:bg-purple-600",
     )}
