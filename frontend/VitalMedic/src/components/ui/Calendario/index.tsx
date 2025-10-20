@@ -73,6 +73,7 @@ const Calendario = ({
         "w-[450px]",
         "bg-white p-4 rounded-xl shadow-2xl",
         "font-sans",
+        "max-[520px]:w-[280px]",
       )}
     >
       {/* Encabezado del Mes y Navegación */}
@@ -83,7 +84,12 @@ const Calendario = ({
         )}
       >
         <BotonDeNavegacion onClick={irAlMesAnterior}>&lt;</BotonDeNavegacion>
-        <h3 className={cn("text-xl font-bold text-gray-800 capitalize")}>
+        <h3
+          className={cn(
+            "text-xl font-bold text-gray-800 capitalize",
+            "max-[520px]:text-lg",
+          )}
+        >
           {textDelEncabezado}
         </h3>
         <BotonDeNavegacion onClick={irAlProximoMes}>&gt;</BotonDeNavegacion>
@@ -97,7 +103,14 @@ const Calendario = ({
         )}
       >
         {DIAS_DE_LA_SEMANA.map((day) => (
-          <div key={day} className={cn("p-1.5", "font-bold text-[17px]")}>
+          <div
+            key={day}
+            className={cn(
+              "p-1.5",
+              "font-bold text-[17px]",
+              "max-[520px]:text-sm",
+            )}
+          >
             {day}
           </div>
         ))}
