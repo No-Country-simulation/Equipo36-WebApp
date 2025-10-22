@@ -1,7 +1,5 @@
 package com.vitalmedic.VitalMedic.security;
 
-
-import com.vitalmedic.VitalMedic.config.CorsConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,6 +31,7 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/redoc.html",
                                 "/api/admin/create-doctor",
+                                "/api/specialty/**",
                                 "/api/doctors/**",
                                 "/api/enums/identifier-systems").permitAll()
                         .anyRequest().authenticated()

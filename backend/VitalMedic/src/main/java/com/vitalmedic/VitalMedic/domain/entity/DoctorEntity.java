@@ -23,8 +23,9 @@ public class DoctorEntity {
     @Column(length = 100)
     private String lastName;
 
-    @Column(length = 100, nullable = false)
-    private String specialty;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "specialty_id", nullable = false)
+    private Specialty specialty;
 
     @Column(length = 50, nullable = false)
     private String licenseNumber;
