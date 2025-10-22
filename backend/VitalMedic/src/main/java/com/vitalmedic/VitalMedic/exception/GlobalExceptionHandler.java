@@ -72,6 +72,20 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
+    @ExceptionHandler(ScheduleConflictException.class)
+    public ResponseEntity<ErrorResponse> handleScheduleConflictException(
+            ScheduleConflictException ex, HttpServletRequest request) {
+        log.warn("⚠️ Conflicto de horario detectado en {}: {}", request.getRequestURI(), ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "SCHEDULE_CONFLICT",
+                "Se detectó un conflicto en los bloques horarios enviados.",
+                List.of(ex.getMessage()),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
     // -----------------------------------------------------------------------
     // 🔹 Manejadores existentes
     // -----------------------------------------------------------------------
