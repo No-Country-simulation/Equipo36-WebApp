@@ -1,5 +1,8 @@
 package com.vitalmedic.VitalMedic.controller;
 
+import com.vitalmedic.VitalMedic.domain.dto.ApiResult;
+import com.vitalmedic.VitalMedic.domain.dto.appointment.AvailableDateResponse;
+import com.vitalmedic.VitalMedic.domain.dto.doctor.DoctorAvailabilityResponse;
 import com.vitalmedic.VitalMedic.domain.dto.doctor.DoctorResponseDTO;
 import com.vitalmedic.VitalMedic.domain.dto.doctor.DoctorUpdateDTO;
 import com.vitalmedic.VitalMedic.domain.entity.DoctorEntity;
@@ -12,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -56,5 +60,27 @@ public class DoctorController {
     public ResponseEntity<Void> deleteDoctor(@PathVariable UUID id) {
         doctorService.deleteDoctor(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Obtiener doctores con una especialidad", description = "Devuelve una lista de doctores que tengna la especialidad pasada por ID")
+    @GetMapping("/specialty/{id}")
+    public ResponseEntity<?> getDoctorsBySpecialty(@PathVariable Long id){
+        var response = doctorService.getDoctorsBySpecialty(id);
+        return ResponseEntity.ok(ApiResult.success(response ,"Lista de doctores"));
+    }
+
+
+    @Operation(summary = "Obtiene los bloques de horarios para poder agendar un cita medica", description = "Devuelve una lista de horarios de el dia especificado para poder agendar una cita")
+    @GetMapping("/{doctorId}/availability")
+    public ResponseEntity<?> getDoctorAvailability(UUID doctorId, LocalDate date){
+        DoctorAvailabilityResponse response = doctorService.getDoctorAvailability(doctorId,date);
+        return ResponseEntity.ok(ApiResult.success(response,"Disponibilidad de citas"));
+    }
+
+    @Operation(summary = "Obtiene las fechas disponibles del doctor", description = "Devuelve una lista de fechas en las que el doctor tiene disponibilidad, parte del dia actual, por defecto retorna la lista de fechas de los proximos 30 dias.")
+    @GetMapping("/{doctorId}/available-dates")
+    public ResponseEntity<?> getAvailableDates(@PathVariable UUID doctorId, @RequestParam(defaultValue = "30") int daysAhead) {
+        List<AvailableDateResponse> response = doctorService.getAvailableDates(doctorId, daysAhead);
+        return ResponseEntity.ok(ApiResult.success(response ,""));
     }
 }

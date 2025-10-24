@@ -7,15 +7,16 @@ import com.vitalmedic.VitalMedic.domain.dto.doctorSchedule.DoctorSchedulesReques
 import com.vitalmedic.VitalMedic.domain.dto.doctorSchedule.DoctorSchedulesResponse;
 import com.vitalmedic.VitalMedic.service.DoctorScheduleService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
+@Tag(name = "Horario Doctor")
 @RestController
 @RequestMapping("/api/doctors/{doctorId}/schedules")
 @RequiredArgsConstructor

@@ -1,17 +1,31 @@
 package com.vitalmedic.VitalMedic.domain.enums;
 
 public enum WeekDay {
-    MONDAY,
-    TUESDAY,
-    WEDNESDAY,
-    THURSDAY,
-    FRIDAY,
-    SATURDAY,
-    SUNDAY;
+    MONDAY("Lunes"),
+    TUESDAY("Martes"),
+    WEDNESDAY("Miércoles"),
+    THURSDAY("Jueves"),
+    FRIDAY("Viernes"),
+    SATURDAY("Sábado"),
+    SUNDAY("Domingo");
+
+    private final String spanishName;
+
+    WeekDay(String spanishName) {
+        this.spanishName = spanishName;
+    }
+
+    public String getSpanishName() {
+        return spanishName;
+    }
+
+    @Override
+    public String toString() {
+        return spanishName;
+    }
 
     /**
-     * Convierte desde java.time.WeekDay (el enum estándar de Java)
-     * al enum personalizado de la aplicación.
+     * Convierte desde java.time.DayOfWeek al enum personalizado.
      */
     public static WeekDay fromJavaWeekDay(java.time.DayOfWeek javaWeekDay) {
         if (javaWeekDay == null) {
@@ -21,7 +35,7 @@ public enum WeekDay {
     }
 
     /**
-     * Convierte desde número (1 = MONDAY, 7 = SUNDAY)
+     * Convierte desde número (1 = Lunes, 7 = Domingo)
      */
     public static WeekDay fromNumber(int dayNumber) {
         if (dayNumber < 1 || dayNumber > 7) {
@@ -37,6 +51,15 @@ public enum WeekDay {
         if (dayName == null || dayName.isBlank()) {
             throw new IllegalArgumentException("El nombre del día no puede ser vacío");
         }
-        return WeekDay.valueOf(dayName.trim().toUpperCase());
+
+        // Permitir coincidencias en inglés o español
+        for (WeekDay day : WeekDay.values()) {
+            if (day.name().equalsIgnoreCase(dayName) ||
+                    day.getSpanishName().equalsIgnoreCase(dayName)) {
+                return day;
+            }
+        }
+
+        throw new IllegalArgumentException("Nombre de día no válido: " + dayName);
     }
 }
