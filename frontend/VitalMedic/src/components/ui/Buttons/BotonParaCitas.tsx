@@ -11,7 +11,7 @@ const ESTILO_ESPECIALIDAD = [
 
 const ESTILO_MEDICO = [
   "flex justify-between items-center",
-  "w-[230px] h-[66px] px-1",
+  "w-[290px] h-[70px] px-1",
   "border border-[#E2E8F0] rounded-md",
   "hover:bg-blue-200",
   "active:scale-95",
@@ -36,8 +36,15 @@ const ESTILO_FECHA = [
 interface Props {
   variante: "especialidad" | "medico" | "tipo-de-cita" | "fecha";
   children: ReactNode;
+  selecionado?: boolean;
+  onClick?: () => void;
 }
-const BotonParaCitas = ({ variante, children }: Props) => {
+const BotonParaCitas = ({
+  variante,
+  children,
+  onClick,
+  selecionado = false,
+}: Props) => {
   return (
     <button
       className={cn(
@@ -45,8 +52,10 @@ const BotonParaCitas = ({ variante, children }: Props) => {
         variante === "medico" && ESTILO_MEDICO,
         variante === "tipo-de-cita" && ESTILO_TIPO_DE_CITA,
         variante === "fecha" && ESTILO_FECHA,
+        selecionado && "bg-blue-200",
       )}
       type="button"
+      onClick={onClick}
     >
       {children}
     </button>
