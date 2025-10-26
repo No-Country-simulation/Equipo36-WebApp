@@ -1,15 +1,16 @@
 import { cn } from "clsx-for-tailwind";
 import { useReducer } from "react";
+import { ContextoRegistrarCita } from "../../../../contexts/ContextoRegistrarCita";
 import { toggleNewAppointment } from "../../../../features/modal/modalSlice";
 import { useAppDispatch } from "../../../../hooks/reduxHooks";
 import SingleButton from "../../Buttons/SingleButton";
-import BotonParaCitas from "./BotonParaCitas";
 import ContenidoDeEstado from "./ContenidoDeEstado";
-import Especialidad from "./Especialidad";
-import Fecha from "./Fecha";
+import ListaDeEspecialidades from "./ListaDeEspecialidades";
+import ListaDeMedicos from "./ListaDeMedicos";
+import ListaFechas from "./ListaFechas";
 import Progreso from "./Progreso";
 import { reducer, type State } from "./reduce";
-import TarjetaDeMedico from "./TarjetaDeMedico";
+import TipoDeCita from "./TipoDeCita";
 
 const ESTILO_DE_FONDO = [
   "absolute top-0 leading-0",
@@ -27,15 +28,6 @@ const ESTILO_CONTENIDO_PRINCIPAL = [
   "flex flex-col justify-between items-center",
 ];
 
-const listaDeEspecialidades = [
-  "Cardiología",
-  "Pediatría",
-  "Dermotología",
-  "Medicinal general",
-  "Neurología",
-  "Traumatología",
-];
-
 const estadoInicial: State = {
   progreso: [
     { etiqueta: "Especialidad", estado: "actual" },
@@ -44,6 +36,13 @@ const estadoInicial: State = {
     { etiqueta: "Fecha", estado: "pendiente" },
   ],
   estadoActual: 0,
+  especialidades: [],
+  datosParaRegistrarCita: {
+    especialidad: null,
+    doctor: null,
+    fecha: null,
+    tipoDeCita: null,
+  },
 };
 
 const ModalParaAgregarCita = () => {
@@ -52,124 +51,154 @@ const ModalParaAgregarCita = () => {
 
   return (
     <div className={cn(ESTILO_DE_FONDO)}>
-      <section className={cn(ESTILO_AGREGAR_CITA)}>
-        {/* Grupo de botones superiores */}
-        <div className={cn("w-full flex justify-end items-center")}>
-          <SingleButton
-            variant="secondary"
-            onClick={() => {
-              dispatchAddAppoinmentModal(toggleNewAppointment());
-            }}
-          >
-            Cerrar
-          </SingleButton>
-        </div>
-
-        {/* Titulo */}
-        <h2 className={cn("h-9 text-2xl")}>
-          Agendar nueva cita {state.estadoActual}
-        </h2>
-
-        {/* Contenido principal */}
-        <div title="Tipo de cita" className={cn(ESTILO_CONTENIDO_PRINCIPAL)}>
-          <Progreso etiquetasEstados={state.progreso} />
-
-          <ContenidoDeEstado
-            variante="especialidad"
-            estado={{ actual: state.estadoActual, requerido: 0 }}
-          >
-            {listaDeEspecialidades.map((especialidad) => (
-              <Especialidad key={`especialidad-${especialidad}`}>
-                {especialidad}
-              </Especialidad>
-            ))}
-          </ContenidoDeEstado>
-
-          <ContenidoDeEstado
-            variante="medico-o-fecha"
-            estado={{ actual: state.estadoActual, requerido: 1 }}
-          >
-            <TarjetaDeMedico
-              nombre="Dr. Mata Sanos"
-              especialidad="Médico general"
-            />
-            <TarjetaDeMedico
-              nombre="Dr. Mata Sanos"
-              especialidad="Médico general"
-            />
-            <TarjetaDeMedico
-              nombre="Dr. Mata Sanos"
-              especialidad="Médico general"
-            />
-            <TarjetaDeMedico
-              nombre="Dr. Mata Sanos"
-              especialidad="Médico general"
-            />
-            <TarjetaDeMedico
-              nombre="Dr. Mata Sanos"
-              especialidad="Médico general"
-            />
-            <TarjetaDeMedico
-              nombre="Dr. Mata Sanos"
-              especialidad="Médico general"
-            />
-            <TarjetaDeMedico
-              nombre="Dr. Mata Sanos"
-              especialidad="Médico general"
-            />
-            <TarjetaDeMedico
-              nombre="Dr. Mata Sanos"
-              especialidad="Médico general"
-            />
-            <TarjetaDeMedico
-              nombre="Dr. Mata Sanos"
-              especialidad="Médico general"
-            />
-          </ContenidoDeEstado>
-
-          <ContenidoDeEstado
-            variante="tipo-cita"
-            estado={{ actual: state.estadoActual, requerido: 2 }}
-          >
-            <BotonParaCitas variante="tipo-de-cita">
-              <div className={cn("w-7 h-7", "bg-blue-500")}></div>
-              <b>Presencial</b>
-            </BotonParaCitas>
-            <BotonParaCitas variante="tipo-de-cita">
-              <div className={cn("w-7 h-7", "bg-blue-500")}></div>
-              <b>Virtual</b>
-            </BotonParaCitas>
-          </ContenidoDeEstado>
-
-          <ContenidoDeEstado
-            variante="medico-o-fecha"
-            estado={{ actual: state.estadoActual, requerido: 3 }}
-          >
-            <Fecha fecha="23 octubre" hora="4:00 P.M" />
-            <Fecha fecha="23 octubre" hora="2:00 A.M" />
-            <Fecha fecha="23 octubre" hora="4:30 P.m" />
-            <Fecha fecha="23 octubre" hora="1:00 P.M" />
-          </ContenidoDeEstado>
-
-          <div className={cn("w-full", "flex justify-between")}>
+      <ContextoRegistrarCita.Provider
+        value={{ state: state, dispatch: dispatch }}
+      >
+        <section className={cn(ESTILO_AGREGAR_CITA)}>
+          {/* Grupo de botones superiores */}
+          <div className={cn("w-full flex justify-end items-center")}>
             <SingleButton
-              variant="tertiary"
+              variant="secondary"
               onClick={() => {
-                dispatch({ type: "mover-a-la-izquierda" });
+                dispatchAddAppoinmentModal(toggleNewAppointment());
               }}
             >
-              ← Volver
-            </SingleButton>
-            <SingleButton
-              onClick={() => {
-                dispatch({ type: "mover-a-la-derecha" });
-              }}
-            >
-              Aceptar
+              Cerrar
             </SingleButton>
           </div>
-        </div>
-      </section>
+
+          {/* Titulo */}
+          <h2 className={cn("h-9 text-2xl")}>Agendar nueva cita</h2>
+
+          {/* Contenido principal */}
+          <div title="Tipo de cita" className={cn(ESTILO_CONTENIDO_PRINCIPAL)}>
+            <Progreso etiquetasEstados={state.progreso} />
+
+            <ContenidoDeEstado
+              variante="especialidad"
+              estado={{ actual: state.estadoActual, requerido: 0 }}
+            >
+              <ListaDeEspecialidades />
+            </ContenidoDeEstado>
+
+            <ContenidoDeEstado
+              variante="medico-o-fecha"
+              estado={{ actual: state.estadoActual, requerido: 1 }}
+            >
+              <ListaDeMedicos />
+            </ContenidoDeEstado>
+
+            <ContenidoDeEstado
+              variante="tipo-cita"
+              estado={{ actual: state.estadoActual, requerido: 2 }}
+            >
+              <TipoDeCita lista={["Presencial", "Virtual"]} />
+            </ContenidoDeEstado>
+
+            <ContenidoDeEstado
+              variante="medico-o-fecha"
+              estado={{ actual: state.estadoActual, requerido: 3 }}
+            >
+              <ListaFechas />
+            </ContenidoDeEstado>
+
+            <ContenidoDeEstado
+              variante="envio"
+              estado={{ actual: state.estadoActual, requerido: 4 }}
+            >
+              <div className={cn("flex gap-1")}>
+                <b>Especialidad:</b>
+                <p>{state.datosParaRegistrarCita.especialidad}</p>
+              </div>
+              <div className={cn("flex gap-1")}>
+                <b>Doctor:</b>
+                <p>{state.datosParaRegistrarCita?.doctor?.nombre}</p>
+              </div>
+              <div className={cn("flex gap-1")}>
+                <b>Tipo:</b>
+                <p>{state.datosParaRegistrarCita.tipoDeCita}</p>
+              </div>
+              <div className={cn("flex gap-1")}>
+                <b>Fecha:</b>
+                <p>{state.datosParaRegistrarCita.fecha}</p>
+              </div>
+            </ContenidoDeEstado>
+
+            <div
+              className={cn(
+                "w-full",
+                "flex justify-between",
+                state.estadoActual === 4 && "justify-center",
+              )}
+            >
+              {state.estadoActual !== 4 && (
+                <>
+                  <SingleButton
+                    variant="tertiary"
+                    onClick={() => {
+                      dispatch({ type: "mover-a-la-izquierda" });
+                    }}
+                  >
+                    ← Volver
+                  </SingleButton>
+                  <SingleButton
+                    onClick={() => {
+                      switch (state.estadoActual) {
+                        case 0:
+                          if (
+                            state.datosParaRegistrarCita.especialidad === null
+                          ) {
+                            alert("Debe escojer una opción");
+                            break;
+                          }
+
+                          dispatch({ type: "mover-a-la-derecha" });
+                          break;
+
+                        case 1:
+                          if (
+                            state.datosParaRegistrarCita?.doctor?.id === null
+                          ) {
+                            alert("Debe escojer una opción");
+                            break;
+                          }
+
+                          dispatch({ type: "mover-a-la-derecha" });
+                          break;
+                        case 2:
+                          if (
+                            state.datosParaRegistrarCita.tipoDeCita === null
+                          ) {
+                            alert("Debe escojer una opción");
+                            break;
+                          }
+
+                          dispatch({ type: "mover-a-la-derecha" });
+                          break;
+
+                        case 3:
+                          if (state.datosParaRegistrarCita.fecha === null) {
+                            alert("Debe escojer una opción");
+                            break;
+                          }
+
+                          dispatch({ type: "mover-a-la-derecha" });
+                          break;
+                      }
+                    }}
+                  >
+                    Aceptar
+                  </SingleButton>
+                </>
+              )}
+
+              {state.estadoActual === 4 && (
+                <SingleButton variant="primary">Registrar cita</SingleButton>
+              )}
+            </div>
+          </div>
+        </section>
+      </ContextoRegistrarCita.Provider>
     </div>
   );
 };
