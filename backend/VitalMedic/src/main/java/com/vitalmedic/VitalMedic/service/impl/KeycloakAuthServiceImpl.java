@@ -88,6 +88,22 @@ public class KeycloakAuthServiceImpl implements KeycloakAuthService {
                 });
     }
 
+    @Override
+    public Mono<Map<String, Object>> getGoogleFederatedToken(String userAccessToken) {
+        return WebClient.builder()
+                .baseUrl(keycloakUrl)
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + userAccessToken)
+                .build()
+                .get()
+                .uri("/realms/{realm}/broker/google/token", realm)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
+                .onErrorResume(error -> {
+                    String message = "Error al obtener el token federado de Google: " + error.getMessage();
+                    return Mono.error(new RuntimeException(message, error));
+                });
+    }
+
     // --------------------------- Métodos auxiliares --------------------------- //
 
     private Mono<String> createUserInKeycloak(WebClient client, User user) {
@@ -115,6 +131,21 @@ public class KeycloakAuthServiceImpl implements KeycloakAuthService {
                 .retrieve()
                 .toBodilessEntity()
                 .then();
+    }
+
+    private Mono<String> generateActionLink(String userId, String action) {
+        return getAccessToken()
+                .flatMap(token -> WebClient.builder()
+                        .baseUrl(keycloakUrl)
+                        .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                        .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .build()
+                        .post()
+                        .uri("/admin/realms/{realm}/users/{userId}/execute-actions-email?client_id={clientId}&redirect_uri={redirectUri}", realm, userId, clientId, "https://tusitio.com/auth/complete-action")
+                        .bodyValue(List.of(action))
+                        .retrieve()
+                        .toBodilessEntity()
+                        .thenReturn("https://tusitio.com/auth/complete-action")); // o recuperar el enlace real si usas Keycloak REST v22+
     }
 
     private Mono<String> getUserIdByEmail(WebClient client, String email) {

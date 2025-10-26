@@ -11,6 +11,7 @@ public record AppointmentResponse(
         LocalTime startTime,
         LocalTime endTime,
         String status,
-        String type
+        String type,
+        String meetLink
 )
 {}

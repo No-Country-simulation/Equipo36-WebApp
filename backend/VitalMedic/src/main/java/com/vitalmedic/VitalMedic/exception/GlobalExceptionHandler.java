@@ -72,6 +72,32 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
+    @ExceptionHandler(DoctorNotAvailableException.class)
+    public ResponseEntity<ErrorResponse> handleDoctorNotAvailableException(DoctorNotAvailableException ex, HttpServletRequest request) {
+        log.warn("🚫 Intento de crear cita fuera del horario laboral: {}", ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "DOCTOR_NOT_AVAILABLE",
+                "El horario seleccionado no pertenece al horario laboral del doctor",
+                List.of(ex.getMessage()),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(AppointmentConflictException.class)
+    public ResponseEntity<ErrorResponse> handleAppointmentConflictException(AppointmentConflictException ex, HttpServletRequest request) {
+        log.warn("⚠️ Conflicto de horario en creación de cita: {}", ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                "APPOINTMENT_CONFLICT",
+                "El horario seleccionado ya está ocupado",
+                List.of(ex.getMessage()),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
     @ExceptionHandler(ScheduleConflictException.class)
     public ResponseEntity<ErrorResponse> handleScheduleConflictException(
             ScheduleConflictException ex, HttpServletRequest request) {

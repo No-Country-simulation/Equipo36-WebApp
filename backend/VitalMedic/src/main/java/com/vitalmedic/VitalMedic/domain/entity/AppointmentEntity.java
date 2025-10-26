@@ -29,13 +29,13 @@ public class AppointmentEntity {
     private PatientEntity patient;
 
     @Column(nullable = false)
-    private LocalDate date; // fecha de la cita
+    private LocalDate date;
 
     @Column(nullable = false)
-    private LocalTime startTime; // inicio de la cita
+    private LocalTime startTime;
 
     @Column(nullable = false)
-    private LocalTime endTime; // fin de la cita
+    private LocalTime endTime;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -44,4 +44,8 @@ public class AppointmentEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AppointmentStatus status;
+
+    private String googleEventId;
+
+    private String meetLink;
 }

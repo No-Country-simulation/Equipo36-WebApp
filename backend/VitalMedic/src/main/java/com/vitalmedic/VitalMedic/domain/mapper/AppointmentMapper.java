@@ -29,6 +29,7 @@ public interface AppointmentMapper {
     @Mapping(target = "doctorId", source = "entity.doctor.id")
     @Mapping(target = "status", expression = "java(entity.getStatus().name())")
     @Mapping(target = "type", expression = "java(entity.getAppointmentType().name())")
+    @Mapping(target = "meetLink", source = "entity.meetLink")
     AppointmentResponse toResponse(AppointmentEntity entity);
 
 
