@@ -1,12 +1,26 @@
+import type { T_Especialidad } from "../../../../types/agregarCita";
+
 type Estado = "pendiente" | "actual" | "hecho";
 export interface State {
   progreso: { etiqueta: string; estado: Estado }[];
   estadoActual: number;
+  especialidades: T_Especialidad[];
+  datosParaRegistrarCita: {
+    especialidad: string | null;
+    doctor: { id: string | null; nombre: string | null } | null;
+    tipoDeCita: string | null;
+    fecha: string | null;
+  };
 }
-type Action =
+export type Action =
   | { type: "mover-a-la-derecha" }
   | { type: "mover-a-la-izquierda" }
-  | { type: "cambiar-estado-actual"; payload: number };
+  // | { type: "cambiar-estado-actual"; payload: number }
+  | { type: "inicializar-especialidades"; payload: T_Especialidad[] }
+  | { type: "cambiar-especialidad-a"; payload: string }
+  | { type: "cambiar-doctor-a"; payload: { id: string; nombre: string } }
+  | { type: "cambiar-tipo-cita-a"; payload: string }
+  | { type: "cambiar-fecha-a"; payload: string };
 
 export const reducer = (state: State, action: Action): State => {
   switch (action.type) {
@@ -29,7 +43,7 @@ export const reducer = (state: State, action: Action): State => {
           estado: "hecho",
         };
 
-        return { progreso: nuevoProgreso, estadoActual: 4 };
+        return { ...state, progreso: nuevoProgreso, estadoActual: 4 };
       }
 
       if (indiceParaActualizar < 3) {
@@ -46,7 +60,11 @@ export const reducer = (state: State, action: Action): State => {
         estado: "hecho",
       };
 
-      return { progreso: nuevoProgreso, estadoActual: nuevoEstadoActual };
+      return {
+        ...state,
+        progreso: nuevoProgreso,
+        estadoActual: nuevoEstadoActual,
+      };
     }
 
     case "mover-a-la-izquierda": {
@@ -76,9 +94,58 @@ export const reducer = (state: State, action: Action): State => {
       }
 
       return {
+        ...state,
         progreso: nuevoProgreso,
         estadoActual: nuevoEstadoActual,
       };
+    }
+
+    case "inicializar-especialidades": {
+      return { ...state, especialidades: action.payload };
+    }
+
+    case "cambiar-especialidad-a": {
+      const nuevaEspecialidad = action.payload;
+
+      const datosDeRegistroActualizado = {
+        ...state.datosParaRegistrarCita,
+        especialidad: nuevaEspecialidad,
+      };
+
+      return { ...state, datosParaRegistrarCita: datosDeRegistroActualizado };
+    }
+
+    case "cambiar-doctor-a": {
+      const nuevoDoctor = action.payload;
+
+      const datosDeRegistroActualizado = {
+        ...state.datosParaRegistrarCita,
+        doctor: { ...nuevoDoctor },
+      };
+
+      return { ...state, datosParaRegistrarCita: datosDeRegistroActualizado };
+    }
+
+    case "cambiar-tipo-cita-a": {
+      const nuevoTipoDeCita = action.payload;
+
+      const datosDeRegistroActualizado = {
+        ...state.datosParaRegistrarCita,
+        tipoDeCita: nuevoTipoDeCita,
+      };
+
+      return { ...state, datosParaRegistrarCita: datosDeRegistroActualizado };
+    }
+
+    case "cambiar-fecha-a": {
+      const nuevaFecha = action.payload;
+
+      const datosDeRegistroActualizado = {
+        ...state.datosParaRegistrarCita,
+        fecha: nuevaFecha,
+      };
+
+      return { ...state, datosParaRegistrarCita: datosDeRegistroActualizado };
     }
 
     default:
