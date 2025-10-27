@@ -32,6 +32,8 @@ public class SecurityConfig {
                                 "/v3/api-docs",
                                 "/v3/api-docs/**",
                                 "/redoc.html",
+                                "/ws-chat",
+                                "/ws-chat/**",
                                 "/api/admin/create-doctor",
                                 "/api/doctors/**",
                                 "/api/enums/identifier-systems").permitAll()
