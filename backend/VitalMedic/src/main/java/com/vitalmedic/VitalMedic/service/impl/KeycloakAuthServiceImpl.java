@@ -3,6 +3,8 @@ package com.vitalmedic.VitalMedic.service.impl;
 import com.vitalmedic.VitalMedic.domain.dto.admin.UserResponse;
 import com.vitalmedic.VitalMedic.domain.entity.User;
 import com.vitalmedic.VitalMedic.service.KeycloakAuthService;
+import com.vitalmedic.VitalMedic.service.SendMailService;
+import com.vitalmedic.VitalMedic.utils.TemporaryPasswordGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -12,9 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +32,12 @@ public class KeycloakAuthServiceImpl implements KeycloakAuthService {
     @Value("${keycloak.credentials.secret:}")
     private String clientSecret;
 
+    @Value("${frontend.redirect-uri}")
+    private String frontendUrl;
+
+    private final SendMailService mailService;
+    private final TemporaryPasswordGenerator passwordGenerator;
+
     private WebClient buildClient(String token) {
         return WebClient.builder()
                 .baseUrl(keycloakUrl)
@@ -40,35 +46,28 @@ public class KeycloakAuthServiceImpl implements KeycloakAuthService {
                 .build();
     }
 
-    /**
-     * Crea un usuario en Keycloak sin asignarle rol.
-     * La asignación de rol se realizará posteriormente cuando Keycloak dispare el evento de creación.
-     */
-    @Override
     public Mono<UserResponse> createUser(User user) {
         return getAccessToken()
                 .flatMap(token -> {
                     WebClient client = buildClient(token);
-                    return createUserInKeycloak(client, user)
+                    String tempPassword = passwordGenerator.generate(12);
+
+                    return createUserInKeycloak(client, user, tempPassword)
                             .flatMap(userId ->
                                     assignRoleToExistingUser(userId, user.getRole().name())
-                                            .then(sendPasswordSetupEmail(client, userId)) // 👈 nuevo paso
+                                            .then(sendPasswordSetupEmail(user, tempPassword))
                                             .thenReturn(buildUserResponse(userId, user))
                             );
                 });
     }
 
-    /**
-     * Asigna un rol a un usuario existente en Keycloak.
-     * Usado desde el listener de eventos de creación de usuario.
-     */
     @Override
-    public Mono<Void> assignRoleToExistingUser(String keycloadId, String roleName) {
+    public Mono<Void> assignRoleToExistingUser(String keycloakId, String roleName) {
         return getAccessToken()
                 .flatMap(token -> {
                     WebClient client = buildClient(token);
                     return getRole(client, roleName)
-                            .flatMap(roleMap -> assignRoleToUser(client, keycloadId, roleMap));
+                            .flatMap(roleMap -> assignRoleToUser(client, keycloakId, roleMap));
                 });
     }
 
@@ -104,15 +103,34 @@ public class KeycloakAuthServiceImpl implements KeycloakAuthService {
                 });
     }
 
-    // --------------------------- Métodos auxiliares --------------------------- //
+    private Mono<Void> sendPasswordSetupEmail(User user, String tempPassword) {
+        Map<String, Object> variables = Map.of(
+                "tempPassword", tempPassword,
+                "frontendUrl", frontendUrl,
+                "supportEmail", "soporte@vitalmedic.com"
+        );
 
-    private Mono<String> createUserInKeycloak(WebClient client, User user) {
+        return mailService.sendEmailTemplate(
+                user.getEmail(),
+                "Bienvenido a VitalMedic - Tu contraseña temporal",
+                "password-setup.html",
+                variables
+        );
+    }
+
+    private Mono<String> createUserInKeycloak(WebClient client, User user, String tempPassword) {
+        Map<String, Object> credentials = Map.of(
+                "type", "password",
+                "value", tempPassword,
+                "temporary", true
+        );
+
         Map<String, Object> newUser = Map.of(
                 "username", user.getEmail(),
                 "email", user.getEmail(),
                 "enabled", true,
                 "emailVerified", true,
-                "requiredActions", List.of("UPDATE_PASSWORD")
+                "credentials", List.of(credentials)
         );
 
         return client.post()
@@ -121,31 +139,6 @@ public class KeycloakAuthServiceImpl implements KeycloakAuthService {
                 .retrieve()
                 .toBodilessEntity()
                 .flatMap(response -> getUserIdByEmail(client, user.getEmail()));
-    }
-
-    private Mono<Void> sendPasswordSetupEmail(WebClient client, String userId) {
-        // Envía el correo automático de “establecer contraseña”
-        return client.put()
-                .uri("/admin/realms/{realm}/users/{userId}/execute-actions-email", realm, userId)
-                .bodyValue(List.of("UPDATE_PASSWORD"))
-                .retrieve()
-                .toBodilessEntity()
-                .then();
-    }
-
-    private Mono<String> generateActionLink(String userId, String action) {
-        return getAccessToken()
-                .flatMap(token -> WebClient.builder()
-                        .baseUrl(keycloakUrl)
-                        .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-                        .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                        .build()
-                        .post()
-                        .uri("/admin/realms/{realm}/users/{userId}/execute-actions-email?client_id={clientId}&redirect_uri={redirectUri}", realm, userId, clientId, "https://tusitio.com/auth/complete-action")
-                        .bodyValue(List.of(action))
-                        .retrieve()
-                        .toBodilessEntity()
-                        .thenReturn("https://tusitio.com/auth/complete-action")); // o recuperar el enlace real si usas Keycloak REST v22+
     }
 
     private Mono<String> getUserIdByEmail(WebClient client, String email) {
@@ -205,6 +198,6 @@ public class KeycloakAuthServiceImpl implements KeycloakAuthService {
                                 : ""))
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
-                .map(response -> (String) response.get("access_token"));
+                .map(resp -> (String) resp.get("access_token"));
     }
 }
