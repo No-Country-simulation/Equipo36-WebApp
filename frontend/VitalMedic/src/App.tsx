@@ -3,12 +3,13 @@ import { createBrowserRouter, type RouteObject } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import BaseLayout from "./components/layout/BaseLayout";
 import DashboardLayout from "./components/layout/DashboardLayout";
+import CargandoPagina from "./components/ui/CargandoPagina";
 import StartKeycloak from "./components/ui/StartKeycloak";
-import Appointment from "./pages/patient/Appointment";
-import Inicio from "./pages/patient/Inicio";
 import AgendarCita from "./pages/patient/AgendarCita";
-import HistorialMedico from "./pages/patient/HistorialMedico";
+import Appointment from "./pages/patient/Appointment";
 import Configuracion from "./pages/patient/Configuracion";
+import HistorialMedico from "./pages/patient/HistorialMedico";
+import Inicio from "./pages/patient/Inicio";
 import SalaEspera from "./pages/patient/SalaEspera";
 import { store } from "./store";
 
@@ -29,7 +30,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <p>Cargando</p>,
+        Component: CargandoPagina,
       },
       {
         Component: BaseLayout,

@@ -1,6 +1,6 @@
 import { Outlet } from "react-router";
 import { useAppSelector } from "../../hooks/reduxHooks";
-import AddAppointmentModal from "../ui/Modal/AddAppointmentModal";
+import ModalParaAgregarCita from "../ui/Modal/ModalParaAgregarCita";
 import RowOptionsModal from "../ui/Modal/RowOptionsModal";
 import Header from "./Header";
 
@@ -17,7 +17,7 @@ const BaseLayout = () => {
       <Header />
       <Outlet />
       {showRowOptionsModal && <RowOptionsModal />}
-      {showNewAppointment && <AddAppointmentModal />}
+      {showNewAppointment && <ModalParaAgregarCita />}
     </>
   );
 };

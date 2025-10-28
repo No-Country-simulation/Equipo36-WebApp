@@ -4,12 +4,45 @@ import { useNavigate } from "react-router";
 import { useAppSelector } from "../../hooks/reduxHooks";
 import SingleButton from "./Buttons/SingleButton";
 
+interface UserAvatarProps {
+  firstName?: string;
+  lastName?: string;
+  size?: string;
+}
+const UserAvatar = ({
+  firstName,
+  lastName,
+  size = "w-6 h-6 md:w-8 md:h-8",
+}: UserAvatarProps) => {
+  // Generar iniciales del usuario
+  const getInitials = (first?: string, last?: string) => {
+    const firstInitial = first?.charAt(0)?.toUpperCase() || "U";
+    const lastInitial = last?.charAt(0)?.toUpperCase() || "S";
+    return firstInitial + lastInitial;
+  };
+
+  return (
+    <div
+      className={cn(
+        size,
+        "bg-gradient-to-br from-blue-500 to-purple-600",
+        "rounded-full flex items-center justify-center",
+        "text-white font-semibold",
+        size.includes("w-6") || size.includes("w-8")
+          ? "text-xs md:text-sm"
+          : "text-lg md:text-xl",
+      )}
+    >
+      {getInitials(firstName, lastName)}
+    </div>
+  );
+};
+
 interface Props {
   firstName?: string;
   lastName?: string;
   email?: string;
 }
-
 const User = ({ firstName, lastName, email }: Props) => {
   const [showPanel, setShowPanel] = useState(false);
 
@@ -29,27 +62,6 @@ const User = ({ firstName, lastName, email }: Props) => {
     }
   };
 
-  // Generar iniciales del usuario
-  const getInitials = (first?: string, last?: string) => {
-    const firstInitial = first?.charAt(0)?.toUpperCase() || "U";
-    const lastInitial = last?.charAt(0)?.toUpperCase() || "S";
-    return firstInitial + lastInitial;
-  };
-
-  const UserAvatar = ({ size = "w-6 h-6 md:w-8 md:h-8" }: { size?: string }) => (
-    <div
-      className={cn(
-        size,
-        "bg-gradient-to-br from-blue-500 to-purple-600",
-        "rounded-full flex items-center justify-center",
-        "text-white font-semibold",
-        size.includes("w-6") || size.includes("w-8") ? "text-xs md:text-sm" : "text-lg md:text-xl"
-      )}
-    >
-      {getInitials(firstName, lastName)}
-    </div>
-  );
-
   const componentPanel = (
     <div
       className={cn(
@@ -63,13 +75,21 @@ const User = ({ firstName, lastName, email }: Props) => {
       <div className="text-center">
         <p className={cn("text-gray-500 text-xs md:text-sm mb-2")}>{email}</p>
         <UserAvatar size="w-12 h-12 md:w-16 md:h-16" />
-        <h3 className={cn("text-base md:text-lg font-semibold mt-3 text-gray-900")}>
+        <h3
+          className={cn(
+            "text-base md:text-lg font-semibold mt-3 text-gray-900",
+          )}
+        >
           {firstName} {lastName}
         </h3>
       </div>
 
       <div className="w-full border-t border-gray-100 pt-3 md:pt-4">
-        <SingleButton variant="secondary" fullWidth onClick={handleButtonLogout}>
+        <SingleButton
+          variant="secondary"
+          fullWidth
+          onClick={handleButtonLogout}
+        >
           Cerrar Sesión
         </SingleButton>
       </div>
@@ -92,11 +112,25 @@ const User = ({ firstName, lastName, email }: Props) => {
       >
         <UserAvatar />
         <div className="text-left hidden sm:block">
-          <p className="text-xs md:text-sm font-medium text-gray-900 truncate">{firstName}</p>
+          <p className="text-xs md:text-sm font-medium text-gray-900 truncate">
+            {firstName}
+          </p>
           <p className="text-xs text-gray-500">Paciente</p>
         </div>
-        <svg className="w-3 h-3 md:w-4 md:h-4 text-gray-400 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        <svg
+          role="img"
+          aria-label="title"
+          className="w-3 h-3 md:w-4 md:h-4 text-gray-400 hidden sm:block"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
+          />
         </svg>
       </button>
       {showPanel && componentPanel}
