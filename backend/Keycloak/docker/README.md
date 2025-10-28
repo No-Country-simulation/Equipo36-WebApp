@@ -47,3 +47,17 @@ KEYCLOAK_WEBHOOK_URL=http://host.docker.internal:8080/api/keycloak/webhook   # E
 WEBHOOK_REALM=YourRealmName                                                   # Nombre del realm que disparará el webhook
 
 ```
+
+### 🔧 Usar Google (OAuth) en este realm
+
+Por seguridad el repositorio contiene **valores falsos** para los clientes OAuth de Google.  
+Si quieres usar el inicio de sesión con Google en tu entorno local, debes **reemplazar dos valores** en tu proyecto:
+
+- `google-client-id`
+- `google-client-secret`
+
+Estos valores aparecen en el JSON del realm (`realms/VitalMedic-realms.json`). Busca exactamente esas cadenas y sustitúyelas por las variables reales que obtengas desde Google Cloud Console.
+
+#### Dónde cambiarlos
+- Archivo template (recomendado): `realms/VitalMedic-realm.json`
+- Alternativa: puedes editar el cliente en la Admin Console (`http://localhost:8085/admin`) después de importar el realm.

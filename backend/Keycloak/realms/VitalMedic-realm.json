@@ -7,8 +7,8 @@
   "defaultSignatureAlgorithm" : "RS256",
   "revokeRefreshToken" : false,
   "refreshTokenMaxReuse" : 0,
-  "accessTokenLifespan" : 300,
-  "accessTokenLifespanForImplicitFlow" : 900,
+  "accessTokenLifespan" : 86400,
+  "accessTokenLifespanForImplicitFlow" : 172800,
   "ssoSessionIdleTimeout" : 1800,
   "ssoSessionMaxLifespan" : 36000,
   "ssoSessionIdleTimeoutRememberMe" : 0,
@@ -64,7 +64,9 @@
       "composites" : {
         "realm" : [ "offline_access", "uma_authorization" ],
         "client" : {
-          "account" : [ "view-profile", "manage-account" ]
+          "realm-management" : [ "view-users", "query-users" ],
+          "broker" : [ "read-token" ],
+          "account" : [ "view-profile", "manage-account-links", "manage-account" ]
         }
       },
       "clientRole" : false,
@@ -124,6 +126,14 @@
         "id" : "b9838808-2715-42a4-9b58-77a2e12676ff",
         "name" : "manage-identity-providers",
         "description" : "${role_manage-identity-providers}",
+        "composite" : false,
+        "clientRole" : true,
+        "containerId" : "eea9ff2d-4a11-4d21-9f17-04c73e5367d9",
+        "attributes" : { }
+      }, {
+        "id" : "f541902b-090a-4836-ad71-aaccee709570",
+        "name" : "exchange-token",
+        "description" : "Allows exchanging external tokens for realm tokens",
         "composite" : false,
         "clientRole" : true,
         "containerId" : "eea9ff2d-4a11-4d21-9f17-04c73e5367d9",
@@ -542,7 +552,7 @@
     "enabled" : true,
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
-    "secret" : "kJLmTWqJkuLDODsUSN5TQ20RbMECDr4j",
+    "secret" : "pdZbJHZ85kg4pPR2apq8U2BWDSIQ05bO",
     "redirectUris" : [ ],
     "webOrigins" : [ ],
     "notBefore" : 0,
@@ -558,7 +568,7 @@
     "protocol" : "openid-connect",
     "attributes" : {
       "realm_client" : "false",
-      "client.secret.creation.time" : "1760474205"
+      "client.secret.creation.time" : "1760748711"
     },
     "authenticationFlowBindingOverrides" : { },
     "fullScopeAllowed" : true,
@@ -857,18 +867,32 @@
     "frontchannelLogout" : true,
     "protocol" : "openid-connect",
     "attributes" : {
-      "realm_client" : "false",
-      "oidc.ciba.grant.enabled" : "false",
-      "client.secret.creation.time" : "1759914306",
-      "backchannel.logout.session.required" : "true",
-      "standard.token.exchange.enabled" : "false",
+      "request.object.signature.alg" : "any",
       "frontchannel.logout.session.required" : "true",
       "post.logout.redirect.uris" : "http://localhost:8080/*",
-      "display.on.consent.screen" : "false",
       "oauth2.device.authorization.grant.enabled" : "false",
-      "pkce.code.challenge.method" : "S256",
       "backchannel.logout.revoke.offline.tokens" : "false",
-      "dpop.bound.access.tokens" : "false"
+      "use.refresh.tokens" : "true",
+      "realm_client" : "false",
+      "oidc.ciba.grant.enabled" : "false",
+      "backchannel.logout.session.required" : "true",
+      "client_credentials.use_refresh_token" : "false",
+      "require.pushed.authorization.requests" : "false",
+      "request.object.encryption.enc" : "any",
+      "pkce.code.challenge.method" : "S256",
+      "dpop.bound.access.tokens" : "false",
+      "id.token.as.detached.signature" : "false",
+      "client.secret.creation.time" : "1759914306",
+      "request.object.encryption.alg" : "any",
+      "client.introspection.response.allow.jwt.claim.enabled" : "false",
+      "standard.token.exchange.enabled" : "true",
+      "client.use.lightweight.access.token.enabled" : "false",
+      "request.object.required" : "not required",
+      "access.token.header.type.rfc9068" : "false",
+      "tls.client.certificate.bound.access.tokens" : "false",
+      "acr.loa.map" : "{}",
+      "display.on.consent.screen" : "false",
+      "token.response.type.bearer.lower-case" : "false"
     },
     "authenticationFlowBindingOverrides" : { },
     "fullScopeAllowed" : true,
@@ -1611,7 +1635,7 @@
       "subType" : "anonymous",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "oidc-address-mapper", "oidc-usermodel-property-mapper", "saml-user-attribute-mapper", "oidc-full-name-mapper", "saml-user-property-mapper", "oidc-usermodel-attribute-mapper", "oidc-sha256-pairwise-sub-mapper", "saml-role-list-mapper" ]
+        "allowed-protocol-mapper-types" : [ "oidc-address-mapper", "oidc-sha256-pairwise-sub-mapper", "saml-user-attribute-mapper", "saml-user-property-mapper", "oidc-usermodel-attribute-mapper", "oidc-full-name-mapper", "saml-role-list-mapper", "oidc-usermodel-property-mapper" ]
       }
     }, {
       "id" : "6475daff-3c63-4889-8b0d-0e5a21cb3aaf",
@@ -1620,7 +1644,7 @@
       "subType" : "authenticated",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "saml-role-list-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-address-mapper", "saml-user-attribute-mapper", "oidc-usermodel-attribute-mapper", "oidc-full-name-mapper", "oidc-usermodel-property-mapper", "saml-user-property-mapper" ]
+        "allowed-protocol-mapper-types" : [ "oidc-full-name-mapper", "saml-user-property-mapper", "saml-role-list-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-address-mapper", "oidc-usermodel-property-mapper", "saml-user-attribute-mapper", "oidc-usermodel-attribute-mapper" ]
       }
     }, {
       "id" : "8d4450df-8bc2-4be9-82f8-4b987861c9c5",
@@ -2396,7 +2420,10 @@
     "clientOfflineSessionMaxLifespan" : "0",
     "oauth2DevicePollingInterval" : "5",
     "clientSessionIdleTimeout" : "0",
+    "actionTokenGeneratedByUserLifespan.verify-email" : "",
+    "actionTokenGeneratedByUserLifespan.idp-verify-account-via-email" : "",
     "clientOfflineSessionIdleTimeout" : "0",
+    "actionTokenGeneratedByUserLifespan.execute-actions" : "",
     "cibaInterval" : "5",
     "realmReusableOtpCode" : "false",
     "cibaExpiresIn" : "120",
@@ -2405,7 +2432,9 @@
     "parRequestUriLifespan" : "60",
     "clientSessionMaxLifespan" : "0",
     "frontendUrl" : "",
-    "acr.loa.map" : "{}"
+    "acr.loa.map" : "{}",
+    "shortVerificationUri" : "",
+    "actionTokenGeneratedByUserLifespan.reset-credentials" : ""
   },
   "keycloakVersion" : "26.4.0",
   "userManagedAccessAllowed" : false,
