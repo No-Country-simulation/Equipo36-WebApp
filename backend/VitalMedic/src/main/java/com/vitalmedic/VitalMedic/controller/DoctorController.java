@@ -72,9 +72,9 @@ public class DoctorController {
 
     @Operation(summary = "Obtiene los bloques de horarios para poder agendar un cita medica", description = "Devuelve una lista de horarios de el dia especificado para poder agendar una cita")
     @GetMapping("/{doctorId}/availability")
-    public ResponseEntity<?> getDoctorAvailability(UUID doctorId, LocalDate date){
-        DoctorAvailabilityResponse response = doctorService.getDoctorAvailability(doctorId,date);
-        return ResponseEntity.ok(ApiResult.success(response,"Disponibilidad de citas"));
+    public ResponseEntity<?> getDoctorAvailability(@PathVariable UUID doctorId, @RequestParam LocalDate date) {
+        DoctorAvailabilityResponse response = doctorService.getDoctorAvailability(doctorId, date);
+        return ResponseEntity.ok(ApiResult.success(response, "Disponibilidad de citas"));
     }
 
     @Operation(summary = "Obtiene las fechas disponibles del doctor", description = "Devuelve una lista de fechas en las que el doctor tiene disponibilidad, parte del dia actual, por defecto retorna la lista de fechas de los proximos 30 dias.")
