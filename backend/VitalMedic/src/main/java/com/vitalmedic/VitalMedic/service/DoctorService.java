@@ -19,7 +19,7 @@ public interface DoctorService {
 
     List<DoctorEntity> getAllDoctors();
 
-    DoctorEntity updateDoctor(UUID id, DoctorUpdateDTO dto);  // 👈 antes recibía DoctorEntity
+    DoctorEntity updateDoctor(UUID id, DoctorUpdateDTO dto);
 
     void deleteDoctor(UUID id);
 

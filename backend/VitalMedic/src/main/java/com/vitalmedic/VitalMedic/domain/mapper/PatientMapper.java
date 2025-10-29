@@ -27,6 +27,7 @@ public interface PatientMapper {
 
     OnboardingProfileResponse toOnbordingProfileResponse(PatientEntity patientEntity);
 
+    @Mapping(source = "photoUrl", target = "photoUrl")
     PatientResponse toPatientResponse(PatientEntity patient);
 
     default Page<PatientResponse> toPatientResponse(Page<PatientEntity> patient) {

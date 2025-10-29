@@ -10,5 +10,6 @@ public record DoctorResponseDTO(
         String licenseNumber,
         String experience,
         String phone,
-        String email
+        String email,
+        String photoUrl
 ) {}

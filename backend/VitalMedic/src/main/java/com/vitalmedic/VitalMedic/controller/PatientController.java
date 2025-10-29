@@ -72,8 +72,8 @@ public class PatientController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    @PutMapping
-    public ResponseEntity<?> updatePatient(@RequestBody @Valid PatientRequest request){
+    @PutMapping(consumes = "multipart/form-data")
+    public ResponseEntity<?> updatePatient(@ModelAttribute @Valid PatientRequest request){
         PatientResponse response = patientService.updatePatient(request);
         return ResponseEntity.ok(ApiResult.success(response,"Paciente actualizado con exito"));
     }

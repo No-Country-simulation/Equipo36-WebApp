@@ -32,6 +32,7 @@ public interface DoctorMapper {
     //  Mapeo de entidad a DTO para retornar al frontend
     @Mapping(source = "user.email", target = "email")
     @Mapping(source = "specialty.name", target = "specialty")
+    @Mapping(source = "photoUrl", target = "photoUrl")
     DoctorResponseDTO toDoctorResponseDTO(DoctorEntity doctor);
 
     // Actualizar entidad a partir del DTO de actualización

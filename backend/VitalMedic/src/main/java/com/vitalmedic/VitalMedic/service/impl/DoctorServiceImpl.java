@@ -15,16 +15,16 @@ import com.vitalmedic.VitalMedic.repository.AppointmentRepository;
 import com.vitalmedic.VitalMedic.repository.DoctorRepository;
 import com.vitalmedic.VitalMedic.repository.DoctorScheduleRepository;
 import com.vitalmedic.VitalMedic.repository.SpecialtyRepository;
+import com.vitalmedic.VitalMedic.service.CloudinaryService;
 import com.vitalmedic.VitalMedic.service.DoctorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.BiConsumer;
 
 @Service
 @RequiredArgsConstructor
@@ -34,10 +34,10 @@ public class DoctorServiceImpl implements DoctorService {
     private final DoctorMapper doctorMapper;
 
     private final SpecialtyRepository specialtyRepository;
-
     private final AppointmentRepository appointmentRepository;
-
     private final DoctorScheduleRepository scheduleRepository;
+
+    private final CloudinaryService cloudinaryService;
 
     @Override
     public DoctorEntity createDoctor(DoctorEntity doctor) {
@@ -58,7 +58,9 @@ public class DoctorServiceImpl implements DoctorService {
     @Override
     public DoctorEntity updateDoctor(UUID id, DoctorUpdateDTO dto) {
         DoctorEntity existingDoctor = getDoctorById(id);
-        // 🧠 Aquí usamos MapStruct en lugar de setters manuales
+
+        handleImageUpdate(dto.deletePhoto(), dto.photo(), existingDoctor.getPhotoPublicId(), existingDoctor::setPhotoUrlAndPublicId, existingDoctor::clearPhoto);
+
         doctorMapper.updateDoctorFromDto(dto, existingDoctor);
 
         Specialty specialty = specialtyRepository.findById(dto.specialty())
@@ -211,5 +213,23 @@ public class DoctorServiceImpl implements DoctorService {
             }
         }
         return false;
+    }
+
+    private void handleImageUpdate(Boolean deleteFlag, MultipartFile newFile, String existingPublicId, BiConsumer<String, String> setUrlAndPublicId, Runnable clearUrlAndPublicId) {
+        if (Boolean.TRUE.equals(deleteFlag)) {
+            if (existingPublicId != null) {
+                cloudinaryService.deleteImage(existingPublicId);
+                clearUrlAndPublicId.run();
+            }
+        } else if (newFile != null && !newFile.isEmpty()) {
+            if (existingPublicId != null) {
+                cloudinaryService.deleteImage(existingPublicId);
+            }
+            Map<String, Object> uploadResult = cloudinaryService.uploadImage(newFile);
+            setUrlAndPublicId.accept(
+                    (String) uploadResult.get("secure_url"),
+                    (String) uploadResult.get("public_id")
+            );
+        }
     }
 }

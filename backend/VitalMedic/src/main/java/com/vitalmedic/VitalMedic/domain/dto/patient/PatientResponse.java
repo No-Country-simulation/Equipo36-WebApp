@@ -11,6 +11,7 @@ public record PatientResponse(
         String birthDate,
         Gender gender,
         String phone,
-        String address
+        String address,
+        String photoUrl
 ) {
 }

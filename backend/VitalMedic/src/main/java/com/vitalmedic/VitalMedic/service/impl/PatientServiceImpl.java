@@ -17,18 +17,18 @@ import com.vitalmedic.VitalMedic.exception.ResourceNotFoundException;
 import com.vitalmedic.VitalMedic.repository.PatientIdentifierRepository;
 import com.vitalmedic.VitalMedic.repository.PatientRepository;
 import com.vitalmedic.VitalMedic.repository.UserRepository;
-import com.vitalmedic.VitalMedic.service.AuthService;
-import com.vitalmedic.VitalMedic.service.FhirPatientService;
-import com.vitalmedic.VitalMedic.service.KeycloakAuthService;
-import com.vitalmedic.VitalMedic.service.PatientService;
+import com.vitalmedic.VitalMedic.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +40,7 @@ public class PatientServiceImpl implements PatientService {
     private final FhirPatientService fhirPatientService;
     private final KeycloakAuthService keycloakAuthService;
     private final AuthService authService;
+    private final CloudinaryService cloudinaryService;
 
     private final UserRepository userRepository;
     private final PatientMapper patientMapper;
@@ -211,10 +212,10 @@ public class PatientServiceImpl implements PatientService {
         PatientEntity patient = patientRepository.findByUser(user)
                 .orElseThrow(() -> new ResourceNotFoundException("Paciente no encontrado"));
 
+        handleImageUpdate(request.deletePhoto(), request.photo(), patient.getPhotoPublicId(), patient::setPhotoUrlAndPublicId, patient::clearPhoto);
+
         patientMapper.updatePatient(request,patient);
-
         patientRepository.save(patient);
-
         return patientMapper.toPatientResponse(patient);
     }
 
@@ -223,6 +224,24 @@ public class PatientServiceImpl implements PatientService {
     private void validateOnboardingStep(PatientEntity patient, OnboardingStatus expected) {
         if (patient.getOnboardingStatus() != expected) {
             throw new InvalidOnboardingStepException("No puedes realizar esta acción, tu flujo de onboarding no corresponde a este paso.");
+        }
+    }
+
+    private void handleImageUpdate(Boolean deleteFlag, MultipartFile newFile, String existingPublicId, BiConsumer<String, String> setUrlAndPublicId, Runnable clearUrlAndPublicId) {
+        if (Boolean.TRUE.equals(deleteFlag)) {
+            if (existingPublicId != null) {
+                cloudinaryService.deleteImage(existingPublicId);
+                clearUrlAndPublicId.run();
+            }
+        } else if (newFile != null && !newFile.isEmpty()) {
+            if (existingPublicId != null) {
+                cloudinaryService.deleteImage(existingPublicId);
+            }
+            Map<String, Object> uploadResult = cloudinaryService.uploadImage(newFile);
+            setUrlAndPublicId.accept(
+                    (String) uploadResult.get("secure_url"),
+                    (String) uploadResult.get("public_id")
+            );
         }
     }
 }

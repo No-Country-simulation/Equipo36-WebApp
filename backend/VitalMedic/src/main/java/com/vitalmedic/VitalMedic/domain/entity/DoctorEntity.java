@@ -38,6 +38,9 @@ public class DoctorEntity {
     @Column(length = 20)
     private String phone;
 
+    private String photoPublicId;
+    private String photoUrl;
+
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<DoctorSchedule> schedules = new ArrayList<>();
 
@@ -48,5 +51,15 @@ public class DoctorEntity {
     @MapsId
     @JoinColumn(name = "id")
     private User user;
+
+    public void setPhotoUrlAndPublicId(String url, String publicId) {
+        this.photoUrl = url;
+        this.photoPublicId = publicId;
+    }
+
+    public void clearPhoto() {
+        this.photoUrl = null;
+        this.photoPublicId = null;
+    }
 
 }

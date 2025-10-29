@@ -35,6 +35,9 @@ public class PatientEntity {
 
     private String address;
 
+    private String photoPublicId;
+    private String photoUrl;
+
     @Enumerated(EnumType.STRING)
     private OnboardingStatus onboardingStatus = OnboardingStatus.PENDING_IDENTIFIER;
 
@@ -48,5 +51,17 @@ public class PatientEntity {
     @MapsId
     @JoinColumn(name = "id")
     private User user;
+
+
+
+    public void setPhotoUrlAndPublicId(String url, String publicId) {
+        this.photoUrl = url;
+        this.photoPublicId = publicId;
+    }
+
+    public void clearPhoto() {
+        this.photoUrl = null;
+        this.photoPublicId = null;
+    }
 
 }

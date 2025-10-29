@@ -48,9 +48,9 @@ public class DoctorController {
     }
 
     @Operation(summary = "Actualizar un doctor", description = "Permite modificar datos de un doctor usando un DTO de actualización.")
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = "multipart/form-data")
     public ResponseEntity<DoctorResponseDTO> updateDoctor(@PathVariable UUID id,
-                                                          @Valid @RequestBody DoctorUpdateDTO dto) {
+                                                          @Valid @ModelAttribute DoctorUpdateDTO dto) {
         DoctorEntity updated = doctorService.updateDoctor(id, dto);
         return ResponseEntity.ok(doctorMapper.toDoctorResponseDTO(updated));
     }
