@@ -292,3 +292,8 @@ Status: 401 - "Token inválido o expirado"
 **Última actualización**: Enero 2025  
 **Versión**: 1.0.0  
 **Equipo**: Equipo 36 - VitalMedic
+
+
+
+
+

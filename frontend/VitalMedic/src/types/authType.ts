@@ -4,12 +4,10 @@ export interface UserProfile {
   lastName: string;
   email: string;
   emailVerified: boolean;
-  roles?: string[];
+  birthDate?: string;
+  gender?: "MALE" | "FEMALE" | "OTHER";
+  phone?: string;
+  address?: string;
 }
 
-export type UserRole = 'ADMIN' | 'DOCTOR' | 'PATIENT';
-
-export interface RoleBasedRoute {
-  path: string;
-  allowedRoles: UserRole[];
-}
+export type UserRole = "ADMIN" | "DOCTOR" | "PATIENT";

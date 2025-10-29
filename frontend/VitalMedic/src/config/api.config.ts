@@ -5,7 +5,7 @@
  */
 
 export const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api",
+  BASE_URL: "https://vitalmedic-backend.onrender.com",
   API_VERSION: "v1.0.0",
   TIMEOUT: 30000, // 30 segundos
 
@@ -19,25 +19,25 @@ export const API_CONFIG = {
   ENDPOINTS: {
     // Paciente - Onboarding (Requieren autenticación)
     PATIENT: {
-      VERIFY_IDENTIFIER: "/patient/onbording/identifier", // Backend tiene typo onbording (sin 'a')
-      UPDATE_PROFILE: "/patient/onboarding/profile",
-      IMPORT_FHIR_DATA: "/patient/onboarding/import",
-      ONBOARDING_STATUS: "/patient/onboarding/status",
-      GET_PATIENT: "/patient",
-      GET_PATIENT_BY_ID: "/patient",
+      VERIFY_IDENTIFIER: "/api/patient/onboarding/identifier", 
+      UPDATE_PROFILE: "/api/patient/onboarding/profile", 
+      IMPORT_FHIR_DATA: "/api/patient/onboarding/import", 
+      ONBOARDING_STATUS: "/api/patient/onboarding/status", 
+      GET_PATIENT: "/api/patient",
+      GET_PATIENT_BY_ID: "/api/patient",
     },
 
     // Admin
     ADMIN: {
-      CREATE_DOCTOR: "/admin/create-doctor", // ✅ Funciona sin auth
+      CREATE_DOCTOR: "/admin/create-doctor", // Funciona sin auth
     },
 
     // Doctores (Públicos - sin autenticación requerida)
     DOCTORS: {
-      GET_ALL: "/admin/doctors/get-all-doctors", // ✅ Funciona
-      GET_BY_ID: "/admin/doctors/get-doctor", // ✅ Funciona
-      UPDATE: "/admin/doctors/update-doctor", // ✅ Funciona
-      DELETE: "/admin/doctors/delete-doctor", // ✅ Funciona
+      GET_ALL: "/admin/doctors/get-all-doctors", // Funciona
+      GET_BY_ID: "/admin/doctors/get-doctor", // Funciona
+      UPDATE: "/admin/doctors/update-doctor", // Funciona
+      DELETE: "/admin/doctors/delete-doctor", // Funciona
     },
 
     // Enums

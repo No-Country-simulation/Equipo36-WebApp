@@ -6,6 +6,11 @@ import {
   type OnboardingIdentifierResponse,
 } from "../../services/onboardingService";
 import { useAuth } from "../../hooks/useAuth";
+import { isBackendErrorFlagSet, setBackendErrorFlag, clearBackendErrorFlag } from "../../utils/onboardingUtils";
+import OnboardingDebug from "../../components/debug/OnboardingDebug";
+import BackendStatusBanner from "../../components/ui/BackendStatusBanner";
+import { useAppDispatch } from "../../hooks/reduxHooks";
+import { updateUserProfile } from "../../features/auth/authSlice";
 
 // ========================================
 // INTERFACES
@@ -34,6 +39,7 @@ interface OnboardingState {
   loading: boolean;
   error: string | null;
   success: string | null;
+  backendFailing: boolean;
 }
 
 // ========================================
@@ -42,6 +48,7 @@ interface OnboardingState {
 
 const CompleteOnboarding: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const { isAuthenticated, hasRole } = useAuth();
 
   const [state, setState] = useState<OnboardingState>({
@@ -62,6 +69,7 @@ const CompleteOnboarding: React.FC = () => {
     loading: false,
     error: null,
     success: null,
+    backendFailing: false,
   });
 
   // ========================================
@@ -78,6 +86,67 @@ const CompleteOnboarding: React.FC = () => {
       navigate("/dashboard");
       return;
     }
+
+    // Verificar el estado actual del onboarding
+    const checkOnboardingStatus = async () => {
+      // PRIORIDAD 1: Si ya hay un error de backend previo, no verificar nuevamente
+      if (isBackendErrorFlagSet()) {
+        console.log("⚠️ CompleteOnboarding: Backend con error previo, iniciando en paso 1 sin verificar API");
+        setState((prev) => ({
+          ...prev,
+          currentStep: 1,
+          backendFailing: true,
+        }));
+        return;
+      }
+
+      try {
+        console.log("🔍 CompleteOnboarding: Verificando estado del onboarding...");
+        
+        const statusResponse = await OnboardingService.getOnboardingStatus();
+        const currentStatus = statusResponse.status;
+        
+        console.log("📊 CompleteOnboarding: Estado actual:", currentStatus);
+
+        // Determinar el paso inicial basado en el estado
+        let initialStep: 1 | 2 | 3 = 1;
+        
+        switch (currentStatus) {
+          case "PENDING_IDENTIFIER":
+            initialStep = 1;
+            break;
+          case "IMPORT_PROMPT":
+          case "MANUAL_ENTRY":
+            initialStep = 2;
+            break;
+          case "COMPLETED":
+            // Si ya está completado, redirigir al dashboard
+            navigate("/dashboard/patient");
+            return;
+          default:
+            initialStep = 1;
+        }
+
+        setState((prev) => ({
+          ...prev,
+          currentStep: initialStep,
+        }));
+
+        console.log(`🎯 CompleteOnboarding: Iniciando en paso ${initialStep}`);
+      } catch (error: any) {
+        console.warn("⚠️ CompleteOnboarding: Error al verificar estado:", error.message);
+        // En caso de error, marcar backend como fallando y guardar flag
+        console.log("🔄 CompleteOnboarding: Marcando backend como fallando y guardando flag");
+        setBackendErrorFlag();
+        setState((prev) => ({
+          ...prev,
+          currentStep: 1,
+          backendFailing: true,
+        }));
+      }
+    };
+
+    checkOnboardingStatus();
   }, [isAuthenticated, hasRole, navigate]);
 
   // ========================================
@@ -126,26 +195,35 @@ const CompleteOnboarding: React.FC = () => {
   };
 
   const validateProfile = (): boolean => {
-    const { firstName, lastName, birthDate } = state.profileData;
+    const { firstName, lastName, birthDate, gender, phone, address } = state.profileData;
 
+    // Validar firstName - solo letras y espacios
     if (!firstName.trim()) {
       setState((prev) => ({ ...prev, error: "El nombre es obligatorio" }));
       return false;
     }
-
-    if (!lastName.trim()) {
-      setState((prev) => ({
-        ...prev,
-        error: "Los apellidos son obligatorios",
-      }));
+    if (!/^[A-Za-zñáéíóúÁÉÍÓÚ]+(?:\s+[A-Za-zñáéíóúÁÉÍÓÚ]+)*$/.test(firstName.trim())) {
+      setState((prev) => ({ ...prev, error: "El nombre solo puede contener letras y espacios" }));
       return false;
     }
 
+    // Validar lastName - solo letras y espacios
+    if (!lastName.trim()) {
+      setState((prev) => ({ ...prev, error: "Los apellidos son obligatorios" }));
+      return false;
+    }
+    if (!/^[A-Za-zñáéíóúÁÉÍÓÚ]+(?:\s+[A-Za-zñáéíóúÁÉÍÓÚ]+)*$/.test(lastName.trim())) {
+      setState((prev) => ({ ...prev, error: "Los apellidos solo pueden contener letras y espacios" }));
+      return false;
+    }
+
+    // Validar birthDate - formato ISO
     if (!birthDate) {
-      setState((prev) => ({
-        ...prev,
-        error: "La fecha de nacimiento es obligatoria",
-      }));
+      setState((prev) => ({ ...prev, error: "La fecha de nacimiento es obligatoria" }));
+      return false;
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(birthDate)) {
+      setState((prev) => ({ ...prev, error: "La fecha debe estar en formato yyyy-MM-dd" }));
       return false;
     }
 
@@ -153,10 +231,25 @@ const CompleteOnboarding: React.FC = () => {
     const today = new Date();
     const selectedDate = new Date(birthDate);
     if (selectedDate > today) {
-      setState((prev) => ({
-        ...prev,
-        error: "La fecha de nacimiento no puede ser futura",
-      }));
+      setState((prev) => ({ ...prev, error: "La fecha de nacimiento no puede ser futura" }));
+      return false;
+    }
+
+    // Validar gender - debe ser exactamente uno de los valores permitidos
+    if (!["MALE", "FEMALE", "OTHER"].includes(gender)) {
+      setState((prev) => ({ ...prev, error: "El género debe ser MALE, FEMALE u OTHER" }));
+      return false;
+    }
+
+    // Validar phone - formato específico (opcional)
+    if (phone && !/^(\+?\d{1,3}[- ]?)?\d{10,15}$/.test(phone.trim())) {
+      setState((prev) => ({ ...prev, error: "El teléfono debe tener entre 10 y 15 dígitos" }));
+      return false;
+    }
+
+    // Validar address - máximo 200 caracteres (opcional)
+    if (address && address.length > 200) {
+      setState((prev) => ({ ...prev, error: "La dirección no puede tener más de 200 caracteres" }));
       return false;
     }
 
@@ -288,8 +381,28 @@ const CompleteOnboarding: React.FC = () => {
     try {
       setState((prev) => ({ ...prev, loading: true, error: null }));
 
+      console.log("💾 CompleteOnboarding: Actualizando perfil...");
+      console.log("📤 CompleteOnboarding: Datos a enviar:", state.profileData);
+      
       // Intentar actualizar el perfil directamente
       await OnboardingService.updateProfile(state.profileData);
+
+      console.log("✅ CompleteOnboarding: Perfil actualizado exitosamente");
+
+      // Actualizar el perfil del usuario en Redux con los datos del onboarding
+      console.log("🔄 CompleteOnboarding: Actualizando perfil en Redux...");
+      dispatch(updateUserProfile({
+        firstName: state.profileData.firstName,
+        lastName: state.profileData.lastName,
+        birthDate: state.profileData.birthDate,
+        gender: state.profileData.gender,
+        phone: state.profileData.phone,
+        address: state.profileData.address,
+      }));
+
+      // Limpiar flag de error del backend al completar exitosamente
+      console.log("🧹 CompleteOnboarding: Limpiando flag de error del backend");
+      clearBackendErrorFlag();
 
       setState((prev) => ({
         ...prev,
@@ -298,24 +411,61 @@ const CompleteOnboarding: React.FC = () => {
         success: "¡Perfil completado exitosamente!",
       }));
 
-      setTimeout(() => {
-        navigate("/dashboard/patient");
-      }, 3000);
+      // Redirigir inmediatamente al dashboard sin delay
+      navigate("/dashboard/patient");
     } catch (error: any) {
-      // MANEJO ROBUSTO DE ERRORES - Cualquier error después del paso 1 = COMPLETADO
-      // Ya que el identificador se guardó exitosamente en el paso 1
+      console.warn("⚠️ CompleteOnboarding: Error al actualizar perfil:", error.message);
+      
+      // MANEJO ROBUSTO DE ERRORES - Si el identificador ya se guardó en el paso 1,
+      // consideramos el onboarding como completado funcionalmente
+      const status = error.response?.status;
+      
+      if (status === 400 && error.response?.data?.message?.includes("flujo de onboarding")) {
+        // Error específico del backend - el usuario ya completó el onboarding
+        console.log("🧹 CompleteOnboarding: Limpiando flag de error del backend (onboarding ya completado)");
+        
+        // Actualizar el perfil del usuario en Redux también en caso de error
+        dispatch(updateUserProfile({
+          firstName: state.profileData.firstName,
+          lastName: state.profileData.lastName,
+          birthDate: state.profileData.birthDate,
+          gender: state.profileData.gender,
+          phone: state.profileData.phone,
+          address: state.profileData.address,
+        }));
+        
+        clearBackendErrorFlag();
+        setState((prev) => ({
+          ...prev,
+          loading: false,
+          currentStep: 3,
+          success: "¡Registro completado! Tu información ya está guardada en el sistema.",
+        }));
+      } else {
+        // Otros errores - asumir que el identificador se guardó correctamente
+        console.log("🧹 CompleteOnboarding: Limpiando flag de error del backend (identificador guardado)");
+        
+        // Actualizar el perfil del usuario en Redux también en caso de error
+        dispatch(updateUserProfile({
+          firstName: state.profileData.firstName,
+          lastName: state.profileData.lastName,
+          birthDate: state.profileData.birthDate,
+          gender: state.profileData.gender,
+          phone: state.profileData.phone,
+          address: state.profileData.address,
+        }));
+        
+        clearBackendErrorFlag();
+        setState((prev) => ({
+          ...prev,
+          loading: false,
+          currentStep: 3,
+          success: `¡Registro completado! Tu identificador ${state.selectedSystem} ya fue guardado en el sistema. Puedes continuar usando VitalMedic.`,
+        }));
+      }
 
-      setState((prev) => ({
-        ...prev,
-        loading: false,
-        currentStep: 3,
-        success: `¡Registro completado! Tu identificador ${state.selectedSystem} ya fue guardado en el sistema. Puedes continuar usando VitalMedic.`,
-      }));
-
-      // Redirigir al dashboard
-      setTimeout(() => {
-        navigate("/dashboard/patient");
-      }, 3000);
+      // Redirigir inmediatamente al dashboard sin delay
+      navigate("/dashboard/patient");
     }
   };
 
@@ -712,12 +862,23 @@ const CompleteOnboarding: React.FC = () => {
         {/* Progress Bar */}
         {renderProgressBar()}
 
+        {/* Backend Status Banner */}
+        <BackendStatusBanner isBackendFailing={state.backendFailing} />
+
         {/* Content */}
         {state.currentStep === 1 && renderStep1()}
         {state.currentStep === 2 && renderStep2()}
         {state.currentStep === 3 && renderStep3()}
+
+        {/* Debug Component - Solo en desarrollo */}
+        {import.meta.env.DEV && (
+          <div className="mt-8">
+            <OnboardingDebug />
+          </div>
+        )}
       </div>
-    </div>
+      
+          </div>
   );
 };
 

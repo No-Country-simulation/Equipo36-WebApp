@@ -10,6 +10,18 @@ class ApiClient {
     this.baseURL = API_CONFIG.BASE_URL;
   }
 
+  // Normaliza y construye la URL final; si ya es absoluta, la respeta
+  private buildUrl(pathOrUrl: string): string {
+    const isAbsolute = /^https?:\/\//i.test(pathOrUrl);
+    const finalUrl = isAbsolute
+      ? pathOrUrl
+      : `${this.baseURL.replace(/\/+$/,'')}${pathOrUrl.startsWith('/') ? '' : '/'}${pathOrUrl}`;
+    // Log de debugging
+    // eslint-disable-next-line no-console
+    console.debug("API →", finalUrl);
+    return finalUrl;
+  }
+
   // Método para obtener el token de Keycloak directamente del cliente
   private getAuthToken(): string | null {
     try {
@@ -40,8 +52,9 @@ class ApiClient {
   }
 
   async post<T>(url: string, data: any): Promise<AxiosResponse<T>> {
+    const finalUrl = this.buildUrl(url);
     try {
-      const response = await axios.post<T>(`${this.baseURL}${url}`, data, {
+      const response = await axios.post<T>(finalUrl, data, {
         headers: this.getAuthHeaders(),
         timeout: API_CONFIG.TIMEOUT,
       });
@@ -50,8 +63,12 @@ class ApiClient {
     } catch (error: any) {
       // Para los endpoints de onboarding, no usar handleError - dejamos que el servicio lo maneje
       if (
-        url.includes("/patient/onbording/identifier") ||
-        url.includes("/patient/onboarding/profile")
+        // identifier tiene ruta con typo 'onbording' en backend
+        url.includes("/api/patient/onbording/identifier")   || finalUrl.includes("/api/patient/onbording/identifier")   ||
+        url.includes("/api/patient/onboarding/identifier")  || finalUrl.includes("/api/patient/onboarding/identifier")  ||
+        url.includes("/api/patient/onboarding/profile")   || finalUrl.includes("/api/patient/onboarding/profile")   ||
+        url.includes("/api/patient/onboarding/import")    || finalUrl.includes("/api/patient/onboarding/import")    ||
+        url.includes("/api/patient/onboarding/status")    || finalUrl.includes("/api/patient/onboarding/status")
       ) {
         throw error;
       }
@@ -62,22 +79,35 @@ class ApiClient {
   }
 
   async get<T>(url: string): Promise<AxiosResponse<T>> {
+    const finalUrl = this.buildUrl(url);
     try {
-      const response = await axios.get<T>(`${this.baseURL}${url}`, {
+      const response = await axios.get<T>(finalUrl, {
         headers: this.getAuthHeaders(),
         timeout: API_CONFIG.TIMEOUT,
       });
 
       return response;
-    } catch (error) {
+    } catch (error: any) {
+      // Para los endpoints de onboarding, no usar handleError - dejamos que el servicio lo maneje
+      if (
+        url.includes("/api/patient/onboarding/identifier")   || finalUrl.includes("/api/patient/onboarding/identifier")   ||
+        url.includes("/api/patient/onboarding/identifier")  || finalUrl.includes("/api/patient/onboarding/identifier")  ||
+        url.includes("/api/patient/onboarding/profile")   || finalUrl.includes("/api/patient/onboarding/profile")   ||
+        url.includes("/api/patient/onboarding/import")    || finalUrl.includes("/api/patient/onboarding/import")    ||
+        url.includes("/api/patient/onboarding/status")    || finalUrl.includes("/api/patient/onboarding/status")
+      ) {
+        throw error;
+      }
+
       this.handleError(error as AxiosError);
       throw error;
     }
   }
 
   async put<T>(url: string, data: any): Promise<AxiosResponse<T>> {
+    const finalUrl = this.buildUrl(url);
     try {
-      const response = await axios.put<T>(`${this.baseURL}${url}`, data, {
+      const response = await axios.put<T>(finalUrl, data, {
         headers: this.getAuthHeaders(),
         timeout: API_CONFIG.TIMEOUT,
       });
@@ -90,8 +120,9 @@ class ApiClient {
   }
 
   async delete<T>(url: string): Promise<AxiosResponse<T>> {
+    const finalUrl = this.buildUrl(url);
     try {
-      const response = await axios.delete<T>(`${this.baseURL}${url}`, {
+      const response = await axios.delete<T>(finalUrl, {
         headers: this.getAuthHeaders(),
         timeout: API_CONFIG.TIMEOUT,
       });

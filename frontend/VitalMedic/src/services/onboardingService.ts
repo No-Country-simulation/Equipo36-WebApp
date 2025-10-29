@@ -51,12 +51,15 @@ export class OnboardingService {
    */
   static async getOnboardingStatus(): Promise<OnboardingStatusResponse> {
     try {
-      const response = await apiClient.get<any>("/patient/onboarding/status");
+      const response = await apiClient.get<any>(
+        API_CONFIG.ENDPOINTS.PATIENT.ONBOARDING_STATUS,
+      );
+      // El backend retorna ApiResult.success con los datos
       return response.data.data;
     } catch (error: any) {
-      // Si falla, asumir que está en MANUAL_ENTRY para permitir continuar
-      console.warn("No se pudo obtener estado, asumiendo MANUAL_ENTRY");
-      return { status: "MANUAL_ENTRY" };
+      console.warn("No se pudo obtener estado del onboarding:", error.message);
+      // Si falla, asumir que está en PENDING_IDENTIFIER para ser más estricto
+      return { status: "PENDING_IDENTIFIER" };
     }
   }
 
@@ -81,13 +84,22 @@ export class OnboardingService {
       return data || { foundInFhir: false };
     } catch (error: any) {
       const status = error.response?.status;
+      const errorCode = error.response?.data?.errorCode;
 
-      // Si es 400, puede ser que el identificador ya exista
-      if (status === 400) {
-        const errorMessage =
-          error.response?.data?.message ||
-          "Este identificador ya está registrado en el sistema";
-        throw new Error(errorMessage);
+      // Manejo específico según la documentación de la API
+      if (status === 400 && errorCode === "RESOURCE_ALREADY_EXISTS") {
+        throw new Error(
+          error.response?.data?.message || "El identificador ya está registrado en el sistema"
+        );
+      }
+
+      // Error de conexión con FHIR - permitir continuar manualmente
+      if (status === 500 && errorCode === "FHIR_CONNECTION_ERROR") {
+        console.warn("Error de FHIR, permitiendo continuar manualmente");
+        return {
+          foundInFhir: false,
+          patientFhir: null,
+        };
       }
 
       // Si es 401, necesita autenticación
@@ -95,11 +107,9 @@ export class OnboardingService {
         throw new Error("Necesitas iniciar sesión para completar tu registro");
       }
 
-      // Si es 500, 404, o cualquier otro error del servidor:
-      // Asumir que el identificador se guardó correctamente pero no se encontró en FHIR
-      // Permitir continuar manualmente
-      if (status === 500 || status === 404 || !status) {
-        // Retornar como si fuera exitoso pero sin datos de FHIR
+      // Para otros errores 500 o 404, permitir continuar manualmente
+      if (status >= 500 || status === 404) {
+        console.warn("Error del servidor, permitiendo continuar manualmente");
         return {
           foundInFhir: false,
           patientFhir: null,
@@ -156,6 +166,7 @@ export class OnboardingService {
         profileData,
       );
 
+      // La API retorna directamente el perfil actualizado
       return response.data;
     } catch (error: any) {
       const status = error.response?.status;
@@ -164,14 +175,30 @@ export class OnboardingService {
         throw new Error("Necesitas iniciar sesión para actualizar tu perfil");
       }
 
+      // Error específico según la documentación - flujo de onboarding inválido
       if (status === 400) {
         throw new Error(
-          "No puedes realizar esta acción, tu flujo de onboarding no corresponde a este paso.",
+          error.response?.data?.message || 
+          "No puedes realizar esta acción, tu flujo de onboarding no corresponde a este paso."
         );
       }
 
-      // Si es 404 o 500+, asumir que se completó básicamente (endpoint no disponible)
-      if (status === 404 || status >= 500) {
+      // Error de FHIR - permitir continuar con datos básicos
+      if (status === 500 && error.response?.data?.errorCode === "FHIR_CONNECTION_ERROR") {
+        console.warn("Error de FHIR en perfil, guardando datos localmente");
+        return {
+          firstName: profileData.firstName,
+          lastName: profileData.lastName,
+          birthDate: profileData.birthDate,
+          gender: profileData.gender,
+          phone: profileData.phone,
+          address: profileData.address,
+        };
+      }
+
+      // Para otros errores 500 o 404, permitir continuar con datos básicos
+      if (status >= 500 || status === 404) {
+        console.warn("Error del servidor en perfil, guardando datos localmente");
         return {
           firstName: profileData.firstName,
           lastName: profileData.lastName,
@@ -196,27 +223,34 @@ export class OnboardingService {
     importAll: boolean = true,
   ): Promise<{ success: boolean; message: string }> {
     try {
-      const response = await apiClient.post<any>("/patient/onboarding/import", {
-        importAll,
-      });
+      const response = await apiClient.post<any>(
+        API_CONFIG.ENDPOINTS.PATIENT.IMPORT_FHIR_DATA,
+        {
+          importAll,
+        },
+      );
 
+      // La API retorna success con un mensaje específico
       return {
         success: true,
         message: response.data.message || "Datos importados correctamente",
       };
     } catch (error: any) {
-      if (error.response?.status === 404) {
+      const status = error.response?.status;
+
+      // 404 - No se encontró paciente en FHIR
+      if (status === 404) {
         return {
           success: false,
           message: "No se encontraron datos médicos para importar",
         };
       }
 
-      // Para cualquier error que no sea 404, asumir que no hay datos para importar
+      // Otros errores - permitir continuar manualmente
+      console.warn("Error al importar datos FHIR:", error.response?.data?.message);
       return {
         success: false,
-        message:
-          "No se pudieron importar datos médicos, continuando manualmente",
+        message: "No se pudieron importar datos médicos, continuando manualmente",
       };
     }
   }
@@ -233,7 +267,9 @@ export class OnboardingService {
   }> {
     try {
       // Intentar obtener datos del paciente
-      const patientResponse = await apiClient.get<any>("/patient");
+      const patientResponse = await apiClient.get<any>(
+        API_CONFIG.ENDPOINTS.PATIENT.GET_PATIENT,
+      );
 
       return {
         hasUser: true,

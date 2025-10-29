@@ -1,4 +1,6 @@
+import { useCallback, useMemo, useState, useEffect } from "react";
 import { useAppSelector } from "./reduxHooks";
+import { OnboardingService } from "../services/onboardingService";
 import type { UserRole } from "../types/authType";
 
 export const useAuth = () => {
@@ -6,7 +8,11 @@ export const useAuth = () => {
     (state) => state.auth,
   );
 
-  const getUserRoles = (): UserRole[] => {
+  // Estados para onboarding
+  const [onboardingStatus, setOnboardingStatus] = useState<string | null>(null);
+  const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(false);
+
+  const userRoles = useMemo<UserRole[]>(() => {
     if (!keycloak || !isAuthenticated) {
       return [];
     }
@@ -36,28 +42,52 @@ export const useAuth = () => {
     }
 
     return validRoles;
-  };
+  }, [isAuthenticated, keycloak]);
 
-  const hasRole = (role: UserRole): boolean => {
-    const userRoles = getUserRoles();
-    return userRoles.includes(role);
-  };
+  // Función para verificar el estado del onboarding
+  const checkOnboardingStatus = useCallback(async () => {
+    if (!isAuthenticated || !hasRole("PATIENT")) {
+      setOnboardingStatus(null);
+      return;
+    }
 
-  const hasAnyRole = (roles: UserRole[]): boolean => {
-    const userRoles = getUserRoles();
-    return roles.some((role) => userRoles.includes(role));
-  };
+    setIsCheckingOnboarding(true);
+    try {
+      const statusResponse = await OnboardingService.getOnboardingStatus();
+      setOnboardingStatus(statusResponse.status);
+    } catch (error) {
+      console.warn("Error al verificar estado del onboarding:", error);
+      setOnboardingStatus("PENDING_IDENTIFIER"); // Asumir estado inicial
+    } finally {
+      setIsCheckingOnboarding(false);
+    }
+  }, [isAuthenticated, userRoles]);
 
-  const getPrimaryRole = (): UserRole => {
-    const roles = getUserRoles();
+  // Verificar onboarding cuando cambie la autenticación
+  useEffect(() => {
+    checkOnboardingStatus();
+  }, [checkOnboardingStatus]);
 
+  const getUserRoles = useCallback((): UserRole[] => userRoles, [userRoles]);
+
+  const hasRole = useCallback(
+    (role: UserRole): boolean => userRoles.includes(role),
+    [userRoles],
+  );
+
+  const hasAnyRole = useCallback(
+    (roles: UserRole[]): boolean => roles.some((role) => userRoles.includes(role)),
+    [userRoles],
+  );
+
+  const getPrimaryRole = useCallback((): UserRole => {
     // Prioridad: ADMIN > DOCTOR > PATIENT
-    if (roles.includes("ADMIN")) return "ADMIN";
-    if (roles.includes("DOCTOR")) return "DOCTOR";
+    if (userRoles.includes("ADMIN")) return "ADMIN";
+    if (userRoles.includes("DOCTOR")) return "DOCTOR";
     return "PATIENT";
-  };
+  }, [userRoles]);
 
-  const getDefaultDashboardPath = (): string => {
+  const getDefaultDashboardPath = useCallback((): string => {
     const primaryRole = getPrimaryRole();
 
     switch (primaryRole) {
@@ -69,7 +99,23 @@ export const useAuth = () => {
       default:
         return "/dashboard/patient";
     }
-  };
+  }, [getPrimaryRole]);
+
+  // Lógica específica para onboarding
+  const needsOnboarding = useMemo(() => {
+    return isAuthenticated && 
+           hasRole("PATIENT") && 
+           onboardingStatus !== null && 
+           onboardingStatus !== "COMPLETED";
+  }, [isAuthenticated, hasRole, onboardingStatus]);
+
+  const shouldRedirectToOnboarding = useMemo(() => {
+    return needsOnboarding && !isCheckingOnboarding;
+  }, [needsOnboarding, isCheckingOnboarding]);
+
+  const refreshOnboardingStatus = useCallback(() => {
+    checkOnboardingStatus();
+  }, [checkOnboardingStatus]);
 
   return {
     keycloak,
@@ -80,5 +126,11 @@ export const useAuth = () => {
     hasAnyRole,
     getPrimaryRole,
     getDefaultDashboardPath,
+    // Estados de onboarding
+    onboardingStatus,
+    needsOnboarding,
+    shouldRedirectToOnboarding,
+    isCheckingOnboarding,
+    refreshOnboardingStatus,
   };
 };

@@ -4,16 +4,26 @@ import modalReducer from "./features/modal/modalSlice";
 
 export const store = configureStore({
   reducer: {
-    auth: authReducer,
     modal: modalReducer,
+    auth: authReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        // Ignorar estas action types
-        ignoredActions: ["auth/setKeycloak", "auth/startAuth"],
-        // Ignorar estas field paths en el state
-        ignoredPaths: ["auth.keycloak"],
+        // Ignorar estas rutas de acción para valores no serializables
+        ignoredActions: [
+          'auth/setKeycloak',
+          'auth/startAuth',
+          'auth/loginSuccess',
+          'auth/logout',
+        ],
+        // Ignorar estas rutas de estado para valores no serializables
+        ignoredPaths: [
+          'auth.keycloak',
+          'auth.keycloak.token',
+          'auth.keycloak.refreshToken',
+          'auth.keycloak.idToken',
+        ],
       },
     }),
 });

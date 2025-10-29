@@ -32,8 +32,13 @@ export const authSlice = createSlice({
     initializedToTrue: (state) => {
       state.initialized = true;
     },
+    updateUserProfile: (state, action: PayloadAction<Partial<UserProfile>>) => {
+      if (state.userProfile) {
+        state.userProfile = { ...state.userProfile, ...action.payload };
+      }
+    },
   },
 });
 
-export const { startAuth, initializedToTrue, setKeycloak } = authSlice.actions;
+export const { startAuth, initializedToTrue, setKeycloak, updateUserProfile } = authSlice.actions;
 export default authSlice.reducer;
