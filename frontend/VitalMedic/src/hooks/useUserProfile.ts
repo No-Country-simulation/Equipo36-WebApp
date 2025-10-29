@@ -12,12 +12,16 @@ export const useUserProfile = () => {
     if (userProfile?.firstName && userProfile?.lastName) {
       return `${userProfile.firstName} ${userProfile.lastName}`;
     }
-    return userProfile?.firstName || "Usuario";
+    if (userProfile?.firstName) return userProfile.firstName;
+    if ((userProfile as any)?.username) return (userProfile as any).username as string;
+    return "Usuario";
   };
 
   // Función para obtener el nombre de bienvenida
   const getWelcomeName = (): string => {
-    return userProfile?.firstName || "Usuario";
+    if (userProfile?.firstName) return userProfile.firstName;
+    if ((userProfile as any)?.username) return (userProfile as any).username as string;
+    return "Usuario";
   };
 
   // Función para obtener la fecha de nacimiento formateada

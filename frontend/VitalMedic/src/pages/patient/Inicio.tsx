@@ -7,10 +7,15 @@ import { useUserProfile } from "../../hooks/useUserProfile";
 
 const Inicio = () => {
   console.log('🏠 Inicio: Componente renderizado');
-  const { getProfileSummary } = useUserProfile();
+  const { getProfileSummary, userProfile } = useUserProfile();
   const navigate = useNavigate();
   
   const profileSummary = getProfileSummary();
+  
+  // Debug logs
+  console.log('👤 Inicio: userProfile:', userProfile);
+  console.log('📊 Inicio: profileSummary:', profileSummary);
+  
 
   const handleAgendarCita = () => {
     navigate("/dashboard/patient/agendar-cita");
@@ -32,17 +37,11 @@ const Inicio = () => {
       >
         {profileSummary.fullName !== profileSummary.welcomeName
           ? `Hola ${profileSummary.fullName}, tu salud es nuestra prioridad`
-          : "Tu salud es nuestra prioridad"
+          : `Hola ${profileSummary.welcomeName}, tu salud es nuestra prioridad`
         }
       </Banner>
 
-      {/* Banner de Consulta Virtual Activa - Solo se muestra si hay una consulta */}
-      <ActiveCallBanner
-        appointmentId="VM1"
-        doctorName="Dr. Roberto Silva"
-        timeRemaining="10 minutos"
-        className="mb-4"
-      />
+      {/* Banner de Consulta Virtual Activa - pendiente de integración real */}
 
       {/* Grid de contenido principal - Responsive */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 md:gap-6">
@@ -51,39 +50,20 @@ const Inicio = () => {
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6">
             <h2 className="text-lg md:text-xl font-semibold text-gray-900 mb-4 md:mb-6">Próxima Cita</h2>
             
-            <div className="bg-linear-to-r from-blue-50 to-indigo-50 rounded-xl p-4 md:p-6 border border-blue-100">
-              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 space-y-3 sm:space-y-0">
-                <div className="flex items-center space-x-3 md:space-x-4">
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-600 rounded-xl flex items-center justify-center shrink-0">
-                    <svg className="w-5 h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 text-sm md:text-base">Dr. Carlos García</h3>
-                    <p className="text-gray-600 text-xs md:text-sm">Medicina General</p>
-                  </div>
+            {
+              <div className="bg-gray-50 rounded-xl p-4 md:p-6 border border-gray-100 text-center">
+                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
                 </div>
-                <span className="inline-flex items-center px-2 md:px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 self-start">
-                  Virtual
-                </span>
-              </div>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 mb-4 md:mb-6">
-                <div>
-                  <p className="text-xs md:text-sm text-gray-600">Fecha</p>
-                  <p className="font-semibold text-gray-900 text-sm md:text-base">15 Octubre 2024</p>
-                </div>
-                <div>
-                  <p className="text-xs md:text-sm text-gray-600">Hora</p>
-                  <p className="font-semibold text-gray-900 text-sm md:text-base">10:30 AM - 11:00 AM</p>
-                </div>
-              </div>
-              
-              <SingleButton variant="primary" fullWidth onClick={() => {}}>
-                Unirse a Consulta
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">No tienes citas programadas</h3>
+                <p className="text-gray-600 mb-4">Agenda tu próxima cita médica</p>
+                <SingleButton variant="primary" fullWidth onClick={handleAgendarCita}>
+                  Agendar Nueva Cita
               </SingleButton>
             </div>
+            }
           </div>
         </div>
 
@@ -106,9 +86,9 @@ const Inicio = () => {
                     <p className="font-semibold text-gray-900">
                       {profileSummary.fullName}
                     </p>
-                  </div>
-                </div>
-                
+          </div>
+        </div>
+
                 {profileSummary.birthDate && (
                   <div className="flex items-center space-x-3">
                     <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">

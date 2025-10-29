@@ -14,6 +14,9 @@ const SidebarLayout = ({ tabs }: Props) => {
   const location = useLocation();
   const userProfile = useAppSelector((state) => state.auth.userProfile);
 
+  // Debug log
+  console.log('🔧 SidebarLayout: userProfile:', userProfile);
+
   let i = 1;
 
   return (

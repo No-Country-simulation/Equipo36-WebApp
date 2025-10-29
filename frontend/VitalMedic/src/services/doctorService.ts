@@ -40,7 +40,7 @@ export class DoctorService {
       console.log('📤 Obteniendo todos los doctores');
       
       const response = await apiClient.get<Doctor[]>(
-        API_CONFIG.ENDPOINTS.DOCTORS.GET_ALL
+        API_CONFIG.ENDPOINTS.DOCTORS.GET_ALL_PUBLIC
       );
       
       console.log('📥 Doctores obtenidos:', response.data);
@@ -48,6 +48,38 @@ export class DoctorService {
     } catch (error) {
       console.error('Error al obtener doctores:', error);
       throw error;
+    }
+  }
+
+  // ✅ Fechas disponibles del doctor (público)
+  static async getAvailableDates(doctorId: string, daysAhead: number = 30): Promise<string[]> {
+    try {
+      const url = API_CONFIG.ENDPOINTS.DOCTORS.GET_AVAILABLE_DATES
+        .replace('{doctorId}', doctorId) + `?daysAhead=${daysAhead}`;
+
+      const response = await apiClient.get<any>(url);
+      // El backend devuelve un objeto; normalizamos a lista de fechas ISO si existe esa forma
+      const data = response.data?.data ?? response.data;
+      if (Array.isArray(data)) {
+        // Puede venir como ["2025-10-30", { date: "2025-10-31" }, ...]
+        return data
+          .map((item: any) => (typeof item === 'string' ? item : (item?.date ?? item?.day ?? item?.value)))
+          .filter((v: any) => typeof v === 'string');
+      }
+      if (Array.isArray(data?.dates)) {
+        return data.dates.map((d: any) => (typeof d === 'string' ? d : d?.date)).filter((v: any) => typeof v === 'string');
+      }
+      if (data && typeof data === 'object') {
+        // A veces puede venir como { "2025-10-30": true, "2025-10-31": true }
+        const keys = Object.keys(data);
+        const isoDateRegex = /^\d{4}-\d{2}-\d{2}$/;
+        const dateKeys = keys.filter((k) => isoDateRegex.test(k));
+        if (dateKeys.length > 0) return dateKeys;
+      }
+      return [];
+    } catch (error) {
+      console.error('Error al obtener fechas disponibles:', error);
+      return [];
     }
   }
 

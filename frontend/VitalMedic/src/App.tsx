@@ -12,6 +12,7 @@ import Appointment from "./pages/patient/Appointment";
 import Configuracion from "./pages/patient/Configuracion";
 import HistorialMedico from "./pages/patient/HistorialMedico";
 import Inicio from "./pages/patient/Inicio";
+import Medicos from "./pages/patient/Medicos";
 import SalaEspera from "./pages/patient/SalaEspera";
 import CompleteOnboarding from "./pages/onboarding/CompleteOnboarding";
 import { store } from "./store";
@@ -19,7 +20,7 @@ import { store } from "./store";
 const patientRouter: RouteObject[] = [
   { index: true, Component: Inicio },
   { path: "mis-citas", Component: Appointment },
-  { path: "medicos", element: <p>médico</p> },
+  { path: "medicos", Component: Medicos },
   { path: "historial", Component: HistorialMedico },
   { path: "configuracion", Component: Configuracion },
   { path: "agendar-cita", Component: AgendarCita },

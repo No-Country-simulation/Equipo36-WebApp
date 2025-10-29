@@ -27,6 +27,8 @@ export const API_CONFIG = {
       GET_PATIENT_BY_ID: "/api/patient",
     },
 
+    // Citas y Consultas (pendiente de integración)
+
     // Admin
     ADMIN: {
       CREATE_DOCTOR: "/admin/create-doctor", // Funciona sin auth
@@ -34,10 +36,17 @@ export const API_CONFIG = {
 
     // Doctores (Públicos - sin autenticación requerida)
     DOCTORS: {
-      GET_ALL: "/admin/doctors/get-all-doctors", // Funciona
-      GET_BY_ID: "/admin/doctors/get-doctor", // Funciona
-      UPDATE: "/admin/doctors/update-doctor", // Funciona
-      DELETE: "/admin/doctors/delete-doctor", // Funciona
+      // Públicos
+      GET_ALL_PUBLIC: "/api/doctors",
+      GET_AVAILABLE_DATES: "/api/doctors/{doctorId}/available-dates",
+      GET_AVAILABILITY_BY_DATE: "/api/doctors/{doctorId}/availability",
+      GET_BY_SPECIALTY: "/api/doctors/specialty/{id}",
+
+      // Admin
+      GET_ALL: "/admin/doctors/get-all-doctors",
+      GET_BY_ID: "/admin/doctors/get-doctor",
+      UPDATE: "/admin/doctors/update-doctor",
+      DELETE: "/admin/doctors/delete-doctor",
     },
 
     // Enums
