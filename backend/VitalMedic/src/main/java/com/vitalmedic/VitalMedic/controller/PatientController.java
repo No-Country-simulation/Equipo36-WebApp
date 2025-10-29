@@ -29,7 +29,7 @@ public class PatientController {
 
     @VerifyIdentifierEndpointDoc
     @SecurityRequirement(name = "bearerAuth")
-    @PostMapping("onbording/identifier")
+    @PostMapping("onboarding/identifier")
     public ResponseEntity<?> verifyIdentifier(@RequestBody @Valid OnbordingIdentifierRequest request){
         OnbordingIdentifierResponse response = patientService.addIdentifierAndSearchInFhir(request);
         return ResponseEntity.ok().
