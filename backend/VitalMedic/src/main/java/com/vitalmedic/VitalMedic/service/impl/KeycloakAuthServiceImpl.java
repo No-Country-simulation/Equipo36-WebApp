@@ -5,15 +5,21 @@ import com.vitalmedic.VitalMedic.domain.entity.User;
 import com.vitalmedic.VitalMedic.service.KeycloakAuthService;
 import com.vitalmedic.VitalMedic.service.SendMailService;
 import com.vitalmedic.VitalMedic.utils.TemporaryPasswordGenerator;
+import io.netty.channel.ChannelOption;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import reactor.netty.http.client.HttpClient;
+import reactor.util.retry.Retry;
 
+import java.time.Duration;
 import java.util.*;
 
 @Service
@@ -186,18 +192,28 @@ public class KeycloakAuthServiceImpl implements KeycloakAuthService {
     }
 
     private Mono<String> getAccessToken() {
-        return WebClient.builder()
+        WebClient webClient = WebClient.builder()
                 .baseUrl(keycloakUrl)
+                .clientConnector(new ReactorClientHttpConnector(
+                        HttpClient.create()
+                                .responseTimeout(Duration.ofSeconds(10))
+                                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000)
+                ))
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                .build()
-                .post()
+                .build();
+
+        return webClient.post()
                 .uri("/realms/{realm}/protocol/openid-connect/token", realm)
-                .bodyValue("grant_type=client_credentials&client_id=" + clientId +
-                        (clientSecret != null && !clientSecret.isEmpty()
-                                ? "&client_secret=" + clientSecret
-                                : ""))
+                .body(BodyInserters.fromFormData("grant_type", "client_credentials")
+                        .with("client_id", clientId)
+                        .with("client_secret", clientSecret))
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
-                .map(resp -> (String) resp.get("access_token"));
+                .map(resp -> (String) resp.get("access_token"))
+                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(3))) // Reintenta 3 veces
+                .onErrorResume(e -> {
+                    System.err.println("❌ Error al obtener token de Keycloak: " + e.getMessage());
+                    return Mono.error(new RuntimeException("No se pudo obtener token de Keycloak", e));
+                });
     }
 }
