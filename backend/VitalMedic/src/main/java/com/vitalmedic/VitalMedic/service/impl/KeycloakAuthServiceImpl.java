@@ -52,6 +52,7 @@ public class KeycloakAuthServiceImpl implements KeycloakAuthService {
                 .build();
     }
 
+    @Override
     public Mono<UserResponse> createUser(User user) {
         return getAccessToken()
                 .flatMap(token -> {
@@ -64,6 +65,16 @@ public class KeycloakAuthServiceImpl implements KeycloakAuthService {
                                             .then(sendPasswordSetupEmail(user, tempPassword))
                                             .thenReturn(buildUserResponse(userId, user))
                             );
+                })
+                .retryWhen(Retry.fixedDelay(2, Duration.ofSeconds(5))
+                        .filter(throwable -> {
+                            System.err.println("⚠️ Reintentando flujo completo por error: " + throwable.getMessage());
+                            return true;
+                        })
+                )
+                .onErrorResume(e -> {
+                    System.err.println("💥 Error al crear usuario en Keycloak: " + e.getMessage());
+                    return Mono.error(new RuntimeException("No se pudo crear el usuario en Keycloak", e));
                 });
     }
 
@@ -73,7 +84,13 @@ public class KeycloakAuthServiceImpl implements KeycloakAuthService {
                 .flatMap(token -> {
                     WebClient client = buildClient(token);
                     return getRole(client, roleName)
-                            .flatMap(roleMap -> assignRoleToUser(client, keycloakId, roleMap));
+                            .flatMap(roleMap -> assignRoleToUser(client, keycloakId, roleMap))
+                            .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(2))
+                                    .filter(err -> {
+                                        System.err.println("⚠️ Reintentando asignar rol: " + err.getMessage());
+                                        return true;
+                                    })
+                            );
                 });
     }
 
@@ -144,7 +161,17 @@ public class KeycloakAuthServiceImpl implements KeycloakAuthService {
                 .bodyValue(newUser)
                 .retrieve()
                 .toBodilessEntity()
-                .flatMap(response -> getUserIdByEmail(client, user.getEmail()));
+                .flatMap(response -> getUserIdByEmail(client, user.getEmail()))
+                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(2))
+                        .filter(err -> {
+                            System.err.println("⚠️ Reintentando crear usuario en Keycloak: " + err.getMessage());
+                            return true;
+                        })
+                )
+                .onErrorResume(e -> {
+                    System.err.println("❌ Error al crear usuario: " + e.getMessage());
+                    return Mono.error(new RuntimeException("No se pudo crear el usuario en Keycloak", e));
+                });
     }
 
     private Mono<String> getUserIdByEmail(WebClient client, String email) {
@@ -156,9 +183,16 @@ public class KeycloakAuthServiceImpl implements KeycloakAuthService {
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<List<Map<String, Object>>>() {})
                 .flatMap(list -> {
-                    if (list.isEmpty()) return Mono.error(new RuntimeException("Usuario no encontrado"));
+                    if (list.isEmpty())
+                        return Mono.error(new RuntimeException("Usuario no encontrado por email: " + email));
                     return Mono.just((String) list.get(0).get("id"));
-                });
+                })
+                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(2))
+                        .filter(err -> {
+                            System.err.println("⚠️ Reintentando obtener ID de usuario: " + err.getMessage());
+                            return true;
+                        })
+                );
     }
 
     private Mono<Map<String, Object>> getRole(WebClient client, String roleName) {
@@ -170,7 +204,13 @@ public class KeycloakAuthServiceImpl implements KeycloakAuthService {
                         list.stream()
                                 .filter(r -> r.get("name").equals(roleName))
                                 .findFirst()
-                ).switchIfEmpty(Mono.error(new RuntimeException("Rol no encontrado: " + roleName))));
+                ).switchIfEmpty(Mono.error(new RuntimeException("Rol no encontrado: " + roleName))))
+                .retryWhen(Retry.fixedDelay(2, Duration.ofSeconds(2))
+                        .filter(err -> {
+                            System.err.println("⚠️ Reintentando obtener rol: " + err.getMessage());
+                            return true;
+                        })
+                );
     }
 
     private Mono<Void> assignRoleToUser(WebClient client, String userId, Map<String, Object> roleMap) {
@@ -210,7 +250,7 @@ public class KeycloakAuthServiceImpl implements KeycloakAuthService {
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
                 .map(resp -> (String) resp.get("access_token"))
-                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(3))) // Reintenta 3 veces
+                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(3)))
                 .onErrorResume(e -> {
                     System.err.println("❌ Error al obtener token de Keycloak: " + e.getMessage());
                     return Mono.error(new RuntimeException("No se pudo obtener token de Keycloak", e));
