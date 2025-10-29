@@ -27,7 +27,10 @@ export const API_CONFIG = {
       GET_PATIENT_BY_ID: "/api/patient",
     },
 
-    // Citas y Consultas (pendiente de integración)
+    // Citas y Consultas (mínimo necesario para historial)
+    APPOINTMENTS: {
+      PATIENT_BY_DATE: "/api/appointments/patient/", // se concatena {patientId}?date=YYYY-MM-DD
+    },
 
     // Admin
     ADMIN: {
