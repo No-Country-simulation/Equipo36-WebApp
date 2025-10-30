@@ -1,21 +1,66 @@
 import { useEffect, useState } from "react";
 
-interface Fecha {
-  date: string;
-  status: string;
+// interface Fecha {
+//   date: string;
+//   status: string;
+// }
+// interface Respuesta {
+//   success: boolean;
+//   message: string;
+//   data: Fecha[];
+// }
+
+// type RespFecha = Promise<Respuesta>;
+
+// export default function useFetchFecha(doctorId: string) {
+//   const URL = `https://vitalmedic-backend.onrender.com/api/doctors/${doctorId}/available-dates`;
+
+//   const [fechas, setFechas] = useState<Fecha[] | null>(null);
+//   const [cargando, setCargando] = useState(true);
+
+//   useEffect(() => {
+//     if (doctorId === "") {
+//       setCargando(false);
+//       return;
+//     }
+
+//     fetch(URL)
+//       .then((resp) => resp.json() as RespFecha)
+
+//       .then((datosJson) => {
+//         setFechas(datosJson.data);
+//       })
+
+//       .finally(() => {
+//         setCargando(false);
+//       });
+//   }, [URL, doctorId]);
+
+//   return { fechas, cargando };
+// }
+
+interface TimeBlock {
+  id: number;
+  startTime: string;
+  endTime: string;
+  active: boolean;
 }
-interface Respuesta {
+
+interface WeeklySchedules {
+  weekDay: string;
+  timeBlocks: TimeBlock[];
+}
+
+type RespFetch = Promise<{
   success: boolean;
   message: string;
-  data: Fecha[];
-}
-
-type RespFecha = Promise<Respuesta>;
+  data: {
+    weeklySchedules: WeeklySchedules[];
+  };
+}>;
 
 export default function useFetchFecha(doctorId: string) {
-  const URL = `https://vitalmedic-backend.onrender.com/api/doctors/${doctorId}/available-dates`;
-
-  const [fechas, setFechas] = useState<Fecha[] | null>(null);
+  const [fechas, setFechas] = useState<WeeklySchedules[] | null>(null);
   const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
@@ -24,17 +69,19 @@ export default function useFetchFecha(doctorId: string) {
       return;
     }
 
-    fetch(URL)
-      .then((resp) => resp.json() as RespFecha)
+    fetch(
+      `https://vitalmedic-backend.onrender.com/api/doctors/${doctorId}/schedules`,
+    )
+      .then((resp) => resp.json() as RespFetch)
 
       .then((datosJson) => {
-        setFechas(datosJson.data);
+        setFechas(datosJson.data.weeklySchedules);
       })
 
       .finally(() => {
         setCargando(false);
       });
-  }, [URL, doctorId]);
+  }, [doctorId]);
 
   return { fechas, cargando };
 }
