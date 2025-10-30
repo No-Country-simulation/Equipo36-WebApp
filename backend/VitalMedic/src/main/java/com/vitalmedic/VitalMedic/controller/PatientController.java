@@ -78,5 +78,13 @@ public class PatientController {
         return ResponseEntity.ok(ApiResult.success(response,"Paciente actualizado con exito"));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
+    @GetMapping("/me")
+    public ResponseEntity<?> myProfile(){
+        PatientResponse response = patientService.myProfile();
+        return ResponseEntity.ok(ApiResult.success(response,"Datos propios del paciente"));
+    }
+
+
 
 }

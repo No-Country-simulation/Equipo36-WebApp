@@ -219,6 +219,13 @@ public class PatientServiceImpl implements PatientService {
         return patientMapper.toPatientResponse(patient);
     }
 
+    @Override
+    public PatientResponse myProfile() {
+        User user = authService.getAuthenticatedUser();
+        PatientEntity patient = patientRepository.findByUser(user).orElseThrow();
+        return patientMapper.toPatientResponse(patient);
+    }
+
 
     /* ---------------------- Helpers ---------------------- */
     private void validateOnboardingStep(PatientEntity patient, OnboardingStatus expected) {

@@ -22,4 +22,6 @@ public interface PatientService {
     Page<PatientResponse> getAllPatientsWithSearch(PatientSearchRequest request, Pageable pageable);
 
     PatientResponse updatePatient(PatientRequest request);
+
+    PatientResponse myProfile();
 }
