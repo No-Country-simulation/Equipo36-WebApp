@@ -10,6 +10,7 @@ export interface State {
     doctor: { id: string | null; nombre: string | null } | null;
     tipoDeCita: string | null;
     fecha: string | null;
+    hora: string | null;
   };
 }
 export type Action =
@@ -20,7 +21,10 @@ export type Action =
   | { type: "cambiar-especialidad-a"; payload: string }
   | { type: "cambiar-doctor-a"; payload: { id: string; nombre: string } }
   | { type: "cambiar-tipo-cita-a"; payload: string }
-  | { type: "cambiar-fecha-a"; payload: string };
+  | {
+      type: "cambiar-fecha-y-hora-a";
+      payload: { fecha: string; hora: string };
+    };
 
 export const reducer = (state: State, action: Action): State => {
   switch (action.type) {
@@ -137,12 +141,14 @@ export const reducer = (state: State, action: Action): State => {
       return { ...state, datosParaRegistrarCita: datosDeRegistroActualizado };
     }
 
-    case "cambiar-fecha-a": {
-      const nuevaFecha = action.payload;
+    case "cambiar-fecha-y-hora-a": {
+      const nuevaFecha = action.payload.fecha;
+      const nuevaHora = action.payload.hora;
 
       const datosDeRegistroActualizado = {
         ...state.datosParaRegistrarCita,
         fecha: nuevaFecha,
+        hora: nuevaHora,
       };
 
       return { ...state, datosParaRegistrarCita: datosDeRegistroActualizado };
