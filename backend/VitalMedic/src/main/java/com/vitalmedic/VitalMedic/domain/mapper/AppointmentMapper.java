@@ -24,10 +24,11 @@ public interface AppointmentMapper {
     @Mapping(target = "status", expression = "java(com.vitalmedic.VitalMedic.domain.enums.AppointmentStatus.PENDING)")
     @Mapping(target = "patient", source = "patient")
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "fhirId", ignore = true)
     AppointmentEntity toEntity(AppointmentRequest request, PatientEntity patient, DoctorEntity doctor, int duration);
 
     @Mapping(target = "doctorId", source = "entity.doctor.id")
-    @Mapping(target = "status", expression = "java(entity.getStatus().name())")
+    @Mapping(target = "status", expression = "java(entity.getStatus().getLabel())")
     @Mapping(target = "type", expression = "java(entity.getAppointmentType().name())")
     @Mapping(target = "meetLink", source = "entity.meetLink")
     AppointmentResponse toResponse(AppointmentEntity entity);

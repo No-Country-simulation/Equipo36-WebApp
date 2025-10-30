@@ -44,7 +44,7 @@ public class SecurityConfig {
                                 "/api/admin/create-doctor",
                                 "/api/specialty/**",
                                 "/api/doctors/**",
-                                "/api/enums/identifier-systems"
+                                "/api/enums/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

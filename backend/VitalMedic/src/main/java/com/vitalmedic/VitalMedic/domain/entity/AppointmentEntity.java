@@ -45,6 +45,8 @@ public class AppointmentEntity {
     @Column(nullable = false)
     private AppointmentStatus status;
 
+    private String fhirId;
+
     private String googleEventId;
 
     private String meetLink;

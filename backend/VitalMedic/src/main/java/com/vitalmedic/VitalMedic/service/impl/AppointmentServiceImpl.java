@@ -18,9 +18,11 @@ import com.vitalmedic.VitalMedic.repository.PatientRepository;
 import com.vitalmedic.VitalMedic.service.AppointmentService;
 import com.vitalmedic.VitalMedic.service.AuthService;
 import com.vitalmedic.VitalMedic.service.KeycloakAuthService;
+import com.vitalmedic.VitalMedic.service.fihr.FhirAppointmentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -44,6 +46,8 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     private final AppointmentMapper appointmentMapper;
     private final PatientRepository patientRepository;
+
+    private final FhirAppointmentService fhirAppointmentService;
 
     public AppointmentResponse createAppointment(AppointmentRequest request) {
         DoctorEntity doctor = doctorRepository.findById(request.doctorId())
@@ -75,6 +79,11 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         appointment.setGoogleEventId(response.getGoogleEventId());
         appointment.setMeetLink(response.getMeetLink());
+
+        // 👉 Crear cita en FHIR
+        String fhirId = fhirAppointmentService.createAppointmentInFhir(appointment);
+        appointment.setFhirId(fhirId);
+
         appointmentRepository.save(appointment);
 
         return appointmentMapper.toResponse(appointment);
@@ -93,6 +102,18 @@ public class AppointmentServiceImpl implements AppointmentService {
     public List<AppointmentWithDoctorResponse> getAppointmentsByPatientAndDate(UUID id, LocalDate date) {
         List<AppointmentEntity> appointments = appointmentRepository.findByPatientIdAndDate(id, date);
         return appointmentMapper.toAppointmentWithDoctorResponse(appointments);
+    }
+
+    @Override
+    @Transactional
+    public AppointmentResponse updateAppointmentStatus(Long appointmentId, AppointmentStatus newStatus) {
+        AppointmentEntity appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Cita no encontrada"));
+
+        fhirAppointmentService.updateAppointmentFhirStatus(appointment.getFhirId(), newStatus.name());
+        appointment.setStatus(newStatus);
+        return appointmentMapper.toResponse(appointment);
+
     }
 
 
@@ -117,7 +138,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .findByDoctorIdAndDateAndStatusIn(
                         doctor.getId(),
                         date,
-                        List.of(AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED)
+                        List.of(AppointmentStatus.PENDING, AppointmentStatus.BOOKED)
                 ).stream()
                 .anyMatch(existing ->
                         startTime.isBefore(existing.getEndTime()) &&

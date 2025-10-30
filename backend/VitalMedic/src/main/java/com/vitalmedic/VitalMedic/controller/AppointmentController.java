@@ -5,6 +5,8 @@ import com.vitalmedic.VitalMedic.domain.dto.appointment.AppointmentRequest;
 import com.vitalmedic.VitalMedic.domain.dto.appointment.AppointmentResponse;
 import com.vitalmedic.VitalMedic.domain.dto.appointment.AppointmentWithDoctorResponse;
 import com.vitalmedic.VitalMedic.domain.dto.appointment.AppointmentWithPatientResponse;
+import com.vitalmedic.VitalMedic.domain.entity.AppointmentEntity;
+import com.vitalmedic.VitalMedic.domain.enums.AppointmentStatus;
 import com.vitalmedic.VitalMedic.service.AppointmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -67,6 +69,13 @@ public class AppointmentController {
         List<AppointmentWithDoctorResponse> appointments =
                 appointmentService.getAppointmentsByPatientAndDate(patientId, date);
         return ResponseEntity.ok(appointments);
+    }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestParam AppointmentStatus status) {
+        AppointmentResponse updated = appointmentService.updateAppointmentStatus(id, status);
+        return ResponseEntity.ok(ApiResult.success(updated,"Actualización de estado exitosa"));
     }
 
 }

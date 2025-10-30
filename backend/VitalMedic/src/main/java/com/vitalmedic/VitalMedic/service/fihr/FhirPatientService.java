@@ -1,4 +1,4 @@
-package com.vitalmedic.VitalMedic.service;
+package com.vitalmedic.VitalMedic.service.fihr;
 
 import com.vitalmedic.VitalMedic.domain.dto.fhir.PatientFhirRequest;
 import com.vitalmedic.VitalMedic.domain.dto.fhir.PatientFhirResponse;

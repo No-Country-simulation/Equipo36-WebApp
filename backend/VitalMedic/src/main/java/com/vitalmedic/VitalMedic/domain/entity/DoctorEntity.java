@@ -38,6 +38,8 @@ public class DoctorEntity {
     @Column(length = 20)
     private String phone;
 
+    private String fhirId;
+
     private String photoPublicId;
     private String photoUrl;
 

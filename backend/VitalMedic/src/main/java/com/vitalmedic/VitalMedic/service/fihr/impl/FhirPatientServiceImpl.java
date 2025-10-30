@@ -1,4 +1,4 @@
-package com.vitalmedic.VitalMedic.service.impl;
+package com.vitalmedic.VitalMedic.service.fihr.impl;
 
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
@@ -8,7 +8,7 @@ import com.vitalmedic.VitalMedic.domain.dto.fhir.PatientFhirResponse;
 import com.vitalmedic.VitalMedic.domain.dto.fhir.PatientIdentifierDto;
 import com.vitalmedic.VitalMedic.domain.enums.IdentifierSystem;
 import com.vitalmedic.VitalMedic.domain.mapper.FhirMapper;
-import com.vitalmedic.VitalMedic.service.FhirPatientService;
+import com.vitalmedic.VitalMedic.service.fihr.FhirPatientService;
 import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.*;

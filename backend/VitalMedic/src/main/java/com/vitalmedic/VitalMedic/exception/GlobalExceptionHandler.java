@@ -11,6 +11,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.Collections;
 import java.util.List;
@@ -115,6 +116,29 @@ public class GlobalExceptionHandler {
     // -----------------------------------------------------------------------
     // 🔹 Manejadores existentes
     // -----------------------------------------------------------------------
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatch(
+            MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
+
+        String paramName = ex.getName(); // nombre del parámetro
+        String paramValue = ex.getValue() != null ? ex.getValue().toString() : "null";
+        String expectedType = ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "desconocido";
+
+        log.warn("⚠️ Tipo de argumento inválido para '{}': valor='{}', tipo esperado={}",
+                paramName, paramValue, expectedType);
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "INVALID_PARAMETER_TYPE",
+                "Tipo de parámetro inválido",
+                List.of("El parámetro '" + paramName + "' recibió el valor '" + paramValue +
+                        "' pero se esperaba tipo " + expectedType + "."),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex, HttpServletRequest request) {

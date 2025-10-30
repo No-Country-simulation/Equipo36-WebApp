@@ -91,7 +91,7 @@ public class DoctorServiceImpl implements DoctorService {
                 .findByDoctorIdAndDateAndStatusIn(
                         doctorId,
                         date,
-                        List.of(AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED)
+                        List.of(AppointmentStatus.PENDING, AppointmentStatus.BOOKED)
                 );
 
         List<DoctorSlotResponse> slots = new ArrayList<>();
@@ -152,7 +152,7 @@ public class DoctorServiceImpl implements DoctorService {
             List<AppointmentEntity> appointments = appointmentRepository.findByDoctorIdAndDateAndStatusIn(
                     doctorId,
                     date,
-                    List.of(AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED)
+                    List.of(AppointmentStatus.PENDING, AppointmentStatus.BOOKED)
             );
 
             int totalSlots = 0;

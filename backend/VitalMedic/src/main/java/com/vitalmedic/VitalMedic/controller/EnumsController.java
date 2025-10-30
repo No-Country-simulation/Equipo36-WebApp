@@ -1,8 +1,10 @@
 package com.vitalmedic.VitalMedic.controller;
 
 import com.vitalmedic.VitalMedic.domain.dto.ApiResult;
+import com.vitalmedic.VitalMedic.domain.dto.enums.AppointmentStatusResponse;
 import com.vitalmedic.VitalMedic.domain.dto.patient.OnboardingImportRequest;
 import com.vitalmedic.VitalMedic.domain.dto.patient.OnboardingImportResponse;
+import com.vitalmedic.VitalMedic.domain.enums.AppointmentStatus;
 import com.vitalmedic.VitalMedic.domain.enums.IdentifierSystem;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -31,5 +34,14 @@ public class EnumsController {
                         "displayName", system.getDisplayName()
                 ))
                 .collect(Collectors.toList());
+    }
+
+    @GetMapping("appointment-status")
+    public ResponseEntity<List<AppointmentStatusResponse>> getAllStatuses() {
+        List<AppointmentStatusResponse> statuses = Arrays.stream(AppointmentStatus.values())
+                .map(status -> new AppointmentStatusResponse(status.name(), status.getLabel()))
+                .toList();
+
+        return ResponseEntity.ok(statuses);
     }
 }

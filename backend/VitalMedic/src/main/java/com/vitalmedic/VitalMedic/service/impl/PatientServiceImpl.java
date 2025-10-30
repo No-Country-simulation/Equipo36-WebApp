@@ -18,6 +18,7 @@ import com.vitalmedic.VitalMedic.repository.PatientIdentifierRepository;
 import com.vitalmedic.VitalMedic.repository.PatientRepository;
 import com.vitalmedic.VitalMedic.repository.UserRepository;
 import com.vitalmedic.VitalMedic.service.*;
+import com.vitalmedic.VitalMedic.service.fihr.FhirPatientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

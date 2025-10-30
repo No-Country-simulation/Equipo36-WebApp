@@ -14,6 +14,7 @@ import com.vitalmedic.VitalMedic.repository.SpecialtyRepository;
 import com.vitalmedic.VitalMedic.repository.UserRepository;
 import com.vitalmedic.VitalMedic.service.AdminService;
 import com.vitalmedic.VitalMedic.service.KeycloakAuthService;
+import com.vitalmedic.VitalMedic.service.fihr.impl.FhirDoctorServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +35,8 @@ public class AdminServiceImpl implements AdminService {
 
     private final KeycloakAuthService keycloakAuthService;
 
+    private final FhirDoctorServiceImpl fhirDoctorService;
+
     @Override
     @Transactional
     public RegisterDoctorResponse createDoctor(RegisterDoctorRequest request) {
@@ -50,6 +53,8 @@ public class AdminServiceImpl implements AdminService {
         doctorEntity.setSpecialty(specialty);
         doctorEntity.setUser(user);
 
+        String fihrId = fhirDoctorService.syncDoctorWithFhir(doctorEntity);
+        doctorEntity.setFhirId(fihrId);
         doctorRepository.save(doctorEntity);
 
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
