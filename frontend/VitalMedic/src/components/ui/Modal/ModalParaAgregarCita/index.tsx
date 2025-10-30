@@ -2,9 +2,11 @@ import { cn } from "clsx-for-tailwind";
 import { useReducer } from "react";
 import { ContextoRegistrarCita } from "../../../../contexts/ContextoRegistrarCita";
 import { toggleNewAppointment } from "../../../../features/modal/modalSlice";
-import { useAppDispatch } from "../../../../hooks/reduxHooks";
+import { useAppDispatch, useAppSelector } from "../../../../hooks/reduxHooks";
+import { diaAFecha } from "../../../../utils/fecha";
 import SingleButton from "../../Buttons/SingleButton";
 import ContenidoDeEstado from "./ContenidoDeEstado";
+import DatosAEnviar from "./DatosAEviar";
 import ListaDeEspecialidades from "./ListaDeEspecialidades";
 import ListaDeMedicos from "./ListaDeMedicos";
 import ListaFechas from "./ListaFechas";
@@ -41,6 +43,7 @@ const estadoInicial: State = {
     especialidad: null,
     doctor: null,
     fecha: null,
+    hora: null,
     tipoDeCita: null,
   },
 };
@@ -48,6 +51,8 @@ const estadoInicial: State = {
 const ModalParaAgregarCita = () => {
   const dispatchAddAppoinmentModal = useAppDispatch();
   const [state, dispatch] = useReducer(reducer, estadoInicial);
+  const accessToken = useAppSelector((state) => state.auth.keycloak?.token);
+  // const userProfile = useAppSelector((state) => state.auth.userProfile);
 
   return (
     <div className={cn(ESTILO_DE_FONDO)}>
@@ -82,7 +87,7 @@ const ModalParaAgregarCita = () => {
             </ContenidoDeEstado>
 
             <ContenidoDeEstado
-              variante="medico-o-fecha"
+              variante="medico"
               estado={{ actual: state.estadoActual, requerido: 1 }}
             >
               <ListaDeMedicos />
@@ -96,7 +101,7 @@ const ModalParaAgregarCita = () => {
             </ContenidoDeEstado>
 
             <ContenidoDeEstado
-              variante="medico-o-fecha"
+              variante="fecha"
               estado={{ actual: state.estadoActual, requerido: 3 }}
             >
               <ListaFechas />
@@ -106,22 +111,7 @@ const ModalParaAgregarCita = () => {
               variante="envio"
               estado={{ actual: state.estadoActual, requerido: 4 }}
             >
-              <div className={cn("flex gap-1")}>
-                <b>Especialidad:</b>
-                <p>{state.datosParaRegistrarCita.especialidad}</p>
-              </div>
-              <div className={cn("flex gap-1")}>
-                <b>Doctor:</b>
-                <p>{state.datosParaRegistrarCita?.doctor?.nombre}</p>
-              </div>
-              <div className={cn("flex gap-1")}>
-                <b>Tipo:</b>
-                <p>{state.datosParaRegistrarCita.tipoDeCita}</p>
-              </div>
-              <div className={cn("flex gap-1")}>
-                <b>Fecha:</b>
-                <p>{state.datosParaRegistrarCita.fecha}</p>
-              </div>
+              <DatosAEnviar />
             </ContenidoDeEstado>
 
             <div
@@ -193,7 +183,50 @@ const ModalParaAgregarCita = () => {
               )}
 
               {state.estadoActual === 4 && (
-                <SingleButton variant="primary">Registrar cita</SingleButton>
+                <SingleButton
+                  variant="primary"
+                  onClick={() => {
+                    const nuevaCita = {
+                      doctorId: state.datosParaRegistrarCita.doctor?.id,
+                      date: diaAFecha(state.datosParaRegistrarCita.fecha),
+                      startTime: state.datosParaRegistrarCita.hora,
+                      type: state.datosParaRegistrarCita.tipoDeCita?.toUpperCase(),
+                    };
+
+                    fetch(
+                      "https://vitalmedic-backend.onrender.com/api/appointments",
+                      {
+                        method: "POST",
+                        headers: {
+                          Authorization: `Bearer ${accessToken}`,
+                          "Content-type": "application/json",
+                        },
+                        body: JSON.stringify(nuevaCita),
+                      },
+                    )
+                      .then((resp) => {
+                        if (!resp.ok) {
+                          console.log("Algo va mal", resp.status);
+                          throw new Error("Error del servidor");
+                        }
+
+                        return resp.json();
+                      })
+
+                      .then(() => {
+                        alert("Envio exitoso");
+                        dispatchAddAppoinmentModal(toggleNewAppointment());
+                      })
+
+                      .catch((err) => {
+                        alert("No se completó el envío");
+                        dispatchAddAppoinmentModal(toggleNewAppointment());
+                        console.log(err);
+                      });
+                  }}
+                >
+                  Registrar cita
+                </SingleButton>
               )}
             </div>
           </div>
