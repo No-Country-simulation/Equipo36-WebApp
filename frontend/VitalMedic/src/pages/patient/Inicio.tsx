@@ -1,4 +1,3 @@
-import React from 'react';
 import { Calendar, Clock, User, Phone, MapPin } from 'lucide-react';
 import { useNavigate } from "react-router";
 import Banner from "../../components/ui/Banner";
@@ -31,7 +30,6 @@ const Inicio = () => {
   
   const { 
     nextAppointment, 
-    appointments, 
     loading: appointmentsLoading 
   } = usePatientAppointments(patientId);
   
