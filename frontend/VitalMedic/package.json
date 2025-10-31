@@ -17,6 +17,7 @@
     "axios": "^1.7.9",
     "clsx-for-tailwind": "^1.0.0",
     "keycloak-js": "^26.2.0",
+    "lucide-react": "^0.548.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-redux": "^9.2.0",
