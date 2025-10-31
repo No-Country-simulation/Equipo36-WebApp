@@ -1,9 +1,7 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Shield, Clock, Users, CheckCircle, Star, ArrowRight, Phone, Mail, MapPin, Stethoscope, Calendar, FileText } from 'lucide-react';
 
 const LandingPage: React.FC = () => {
-  const navigate = useNavigate();
 
   const handleKeycloakLogin = () => {
     // Redirect to Keycloak authentication
