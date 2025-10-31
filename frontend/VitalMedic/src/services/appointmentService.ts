@@ -16,6 +16,7 @@ export interface Appointment {
 
 export interface CreateAppointmentRequest {
   doctorId: string;
+  patientId: string; // ID del paciente que solicita la cita
   date: string; // formato YYYY-MM-DD
   startTime: string; // formato HH:mm (sin segundos)
   type: 'PRESENTIAL' | 'VIRTUAL';

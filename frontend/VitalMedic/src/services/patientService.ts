@@ -74,4 +74,34 @@ export class PatientService {
       throw error;
     }
   }
+
+  static async getPatientData(): Promise<any> {
+    try {
+      console.log('📤 Obteniendo datos del paciente');
+      
+      const response = await apiClient.get(
+        API_CONFIG.ENDPOINTS.PATIENT.GET_PATIENT
+      );
+      
+      return response.data;
+    } catch (error) {
+      console.error('Error al obtener datos del paciente:', error);
+      throw error;
+    }
+  }
+
+  static async getPatientById(patientId: string): Promise<any> {
+    try {
+      console.log('📤 Obteniendo datos del paciente por ID:', patientId);
+      
+      const response = await apiClient.get(
+        `${API_CONFIG.ENDPOINTS.PATIENT.GET_PATIENT_BY_ID}/${patientId}`
+      );
+      
+      return response.data;
+    } catch (error) {
+      console.error('Error al obtener datos del paciente por ID:', error);
+      throw error;
+    }
+  }
 }

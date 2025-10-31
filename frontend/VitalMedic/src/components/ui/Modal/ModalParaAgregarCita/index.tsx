@@ -3,6 +3,7 @@ import { useReducer } from "react";
 import { ContextoRegistrarCita } from "../../../../contexts/ContextoRegistrarCita";
 import { toggleNewAppointment } from "../../../../features/modal/modalSlice";
 import { useAppDispatch } from "../../../../hooks/reduxHooks";
+import { usePatientData } from "../../../../hooks/usePatientData";
 
 import { AppointmentService, type CreateAppointmentRequest } from "../../../../services/appointmentService";
 import SingleButton from "../../Buttons/SingleButton";
@@ -52,6 +53,7 @@ const estadoInicial: State = {
 const ModalParaAgregarCita = () => {
   const dispatchAddAppoinmentModal = useAppDispatch();
   const [state, dispatch] = useReducer(reducer, estadoInicial);
+  const { patientData, loading: patientLoading } = usePatientData();
   // const accessToken = useAppSelector((state) => state.auth.keycloak?.token);
   // const userProfile = useAppSelector((state) => state.auth.userProfile);
 
@@ -223,8 +225,15 @@ const ModalParaAgregarCita = () => {
                     // Formatear la hora al formato HH:mm (sin segundos) que espera el backend
                     const horaFormateada = state.datosParaRegistrarCita.hora.substring(0, 5); // "15:30:00" -> "15:30"
 
+                    // Validar que tenemos los datos del paciente
+                    if (!patientData?.id) {
+                      alert("Error: No se pudo obtener la información del paciente. Por favor, recarga la página e intenta de nuevo.");
+                      return;
+                    }
+
                     const appointmentData: CreateAppointmentRequest = {
                       doctorId: state.datosParaRegistrarCita.doctor.id,
+                      patientId: patientData.id,
                       date: fechaFormateada,
                       startTime: horaFormateada,
                       type: tipoMapeado as 'PRESENTIAL' | 'VIRTUAL',
@@ -232,6 +241,7 @@ const ModalParaAgregarCita = () => {
 
                     console.log("Datos a enviar:", appointmentData);
                     console.log("Estado completo:", state.datosParaRegistrarCita);
+                    console.log("Datos del paciente:", patientData);
 
                     try {
                       const result = await AppointmentService.createAppointment(appointmentData);
@@ -244,7 +254,7 @@ const ModalParaAgregarCita = () => {
                     }
                   }}
                 >
-                  Registrar cita
+                  {patientLoading ? "Cargando..." : "Registrar cita"}
                 </SingleButton>
               )}
             </div>
