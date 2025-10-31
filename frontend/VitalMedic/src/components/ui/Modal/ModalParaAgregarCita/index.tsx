@@ -2,7 +2,7 @@ import { cn } from "clsx-for-tailwind";
 import { useReducer } from "react";
 import { ContextoRegistrarCita } from "../../../../contexts/ContextoRegistrarCita";
 import { toggleNewAppointment } from "../../../../features/modal/modalSlice";
-import { useAppDispatch } from "../../../../hooks/reduxHooks";
+import { useAppDispatch, useAppSelector } from "../../../../hooks/reduxHooks";
 import { usePatientData } from "../../../../hooks/usePatientData";
 
 import { AppointmentService, type CreateAppointmentRequest } from "../../../../services/appointmentService";
@@ -54,8 +54,8 @@ const ModalParaAgregarCita = () => {
   const dispatchAddAppoinmentModal = useAppDispatch();
   const [state, dispatch] = useReducer(reducer, estadoInicial);
   const { patientData, loading: patientLoading } = usePatientData();
+  const userProfile = useAppSelector((state) => state.auth.userProfile);
   // const accessToken = useAppSelector((state) => state.auth.keycloak?.token);
-  // const userProfile = useAppSelector((state) => state.auth.userProfile);
 
   return (
     <div className={cn(ESTILO_DE_FONDO)}>
@@ -226,14 +226,17 @@ const ModalParaAgregarCita = () => {
                     const horaFormateada = state.datosParaRegistrarCita.hora.substring(0, 5); // "15:30:00" -> "15:30"
 
                     // Validar que tenemos los datos del paciente
-                    if (!patientData?.id) {
+                    // Usar patientData.id si está disponible, sino usar userProfile.id como fallback
+                    const patientId = patientData?.id || userProfile?.id;
+                    
+                    if (!patientId) {
                       alert("Error: No se pudo obtener la información del paciente. Por favor, recarga la página e intenta de nuevo.");
                       return;
                     }
 
                     const appointmentData: CreateAppointmentRequest = {
                       doctorId: state.datosParaRegistrarCita.doctor.id,
-                      patientId: patientData.id,
+                      patientId: patientId,
                       date: fechaFormateada,
                       startTime: horaFormateada,
                       type: tipoMapeado as 'PRESENTIAL' | 'VIRTUAL',
@@ -242,6 +245,7 @@ const ModalParaAgregarCita = () => {
                     console.log("Datos a enviar:", appointmentData);
                     console.log("Estado completo:", state.datosParaRegistrarCita);
                     console.log("Datos del paciente:", patientData);
+                    console.log("UserProfile ID usado como fallback:", userProfile?.id);
 
                     try {
                       const result = await AppointmentService.createAppointment(appointmentData);

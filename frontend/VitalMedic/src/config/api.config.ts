@@ -23,8 +23,10 @@ export const API_CONFIG = {
       UPDATE_PROFILE: "/api/patient/onboarding/profile", 
       IMPORT_FHIR_DATA: "/api/patient/onboarding/import", 
       ONBOARDING_STATUS: "/api/patient/onboarding/status", 
-      GET_PATIENT: "/api/patient",
-      GET_PATIENT_BY_ID: "/api/patient",
+      GET_MY_PROFILE: "/api/patient/me", // Obtener perfil del paciente autenticado
+      GET_ALL_PATIENTS: "/api/patient", // Obtener todos los pacientes (con parámetros de búsqueda)
+      GET_PATIENT_BY_ID: "/api/patient", // Obtener paciente por ID
+      UPDATE_PATIENT: "/api/patient", // Actualizar datos del paciente
     },
 
     // Citas y Consultas (mínimo necesario para historial)
@@ -37,16 +39,16 @@ export const API_CONFIG = {
 
     // Especialidades
     SPECIALTY: {
-      GET_ALL: "/api/specialties",
-      GET_BY_ID: "/api/specialties/{id}",
-      CREATE: "/api/specialties",
-      UPDATE: "/api/specialties/{id}",
-      DELETE: "/api/specialties/{id}",
+      GET_ALL: "/api/specialty",
+      GET_BY_ID: "/api/specialty/{id}",
+      CREATE: "/api/specialty",
+      UPDATE: "/api/specialty/{id}",
+      DELETE: "/api/specialty/{id}",
     },
 
     // Admin
     ADMIN: {
-      CREATE_DOCTOR: "/admin/create-doctor", // Funciona sin auth
+      CREATE_DOCTOR: "/api/admin/create-doctor", // Crear doctor
     },
 
     // Doctores (Públicos - sin autenticación requerida)
@@ -66,12 +68,13 @@ export const API_CONFIG = {
 
     // Enums
     ENUMS: {
-      IDENTIFIER_SYSTEMS: "/enums/identifier-systems",
+      IDENTIFIER_SYSTEMS: "/api/enums/identifier-systems",
+      APPOINTMENT_STATUS: "/api/enums/appointment-status",
     },
 
     // Keycloak Webhook (interno)
     KEYCLOAK: {
-      WEBHOOK: "/keycloak/webhook",
+      WEBHOOK: "/api/keycloak/webhook",
     },
   },
 

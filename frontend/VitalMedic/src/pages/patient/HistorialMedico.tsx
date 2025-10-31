@@ -102,7 +102,7 @@ const HistorialMedico = () => {
     
     if (consulta?.isVirtual && consulta.estado === "Activa") {
       // Si es una consulta virtual activa, ir a la sala de espera
-      navigate(`/dashboard/patient/sala-espera/${consultaId}`);
+      navigate(`/dashboard/app/patient/sala-espera/${consultaId}`);
     } else {
       // Para otras consultas, mostrar detalles (implementar después)
       // console.log("Ver detalles de consulta:", consultaId);

@@ -96,7 +96,7 @@ export const useAuth = () => {
         return "/dashboard/doctor";
       case "PATIENT":
       default:
-        return "/dashboard/patient";
+        return "/dashboard/app/patient";
     }
   }, [getPrimaryRole]);
 

@@ -77,10 +77,10 @@ export class PatientService {
 
   static async getPatientData(): Promise<any> {
     try {
-      console.log('📤 Obteniendo datos del paciente');
+      console.log('📤 Obteniendo datos del paciente autenticado');
       
       const response = await apiClient.get(
-        API_CONFIG.ENDPOINTS.PATIENT.GET_PATIENT
+        API_CONFIG.ENDPOINTS.PATIENT.GET_MY_PROFILE
       );
       
       return response.data;

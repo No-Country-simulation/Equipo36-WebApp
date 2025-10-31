@@ -1,0 +1,884 @@
+VitalMedic (v1.0.0)
+Download OpenAPI specification:Download
+
+Aplicación API Rest para la plataforma NoCountry
+
+Doctor
+CRUD de doctores en el sistema
+
+Obtener un doctor por ID
+Devuelve los datos de un doctor a partir de su identificador UUID.
+
+path Parameters
+id
+required
+string <uuid>
+Responses
+200 OK
+
+get
+/api/doctors/{id}
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/doctors/{id}
+Actualizar un doctor
+Permite modificar datos de un doctor usando un DTO de actualización.
+
+path Parameters
+id
+required
+string <uuid>
+Request Body schema: multipart/form-data
+firstName
+required
+string non-empty
+lastName
+required
+string non-empty
+specialty	
+integer <int64>
+licenseNumber	
+string
+experience	
+string
+phone	
+string
+photo	
+string <binary>
+Archivo de imagen (jpg, jpeg, png, webp)
+
+deletePhoto	
+boolean
+Indica si se debe eliminar la foto actual
+
+Responses
+200 OK
+
+put
+/api/doctors/{id}
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/doctors/{id}
+Eliminar un doctor
+Borra un doctor del sistema por su ID.
+
+path Parameters
+id
+required
+string <uuid>
+Responses
+200 OK
+
+delete
+/api/doctors/{id}
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/doctors/{id}
+Obtener todos los doctores
+Devuelve una lista de todos los doctores registrados en el sistema.
+
+Responses
+200 OK
+
+get
+/api/doctors
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/doctors
+Obtiene las fechas disponibles del doctor
+Devuelve una lista de fechas en las que el doctor tiene disponibilidad, parte del dia actual, por defecto retorna la lista de fechas de los proximos 30 dias.
+
+path Parameters
+doctorId
+required
+string <uuid>
+query Parameters
+daysAhead	
+integer <int32>
+Default: 30
+Responses
+200 OK
+
+get
+/api/doctors/{doctorId}/available-dates
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/doctors/{doctorId}/available-dates
+Obtiene los bloques de horarios para poder agendar un cita medica
+Devuelve una lista de horarios de el dia especificado para poder agendar una cita
+
+path Parameters
+doctorId
+required
+string <uuid>
+query Parameters
+date
+required
+string <date>
+Responses
+200 OK
+
+get
+/api/doctors/{doctorId}/availability
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/doctors/{doctorId}/availability
+Obtiener doctores con una especialidad
+Devuelve una lista de doctores que tengna la especialidad pasada por ID
+
+path Parameters
+id
+required
+integer <int64>
+Responses
+200 OK
+
+get
+/api/doctors/specialty/{id}
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/doctors/specialty/{id}
+Especialidad Medica
+getSpecialtyById
+path Parameters
+id
+required
+integer <int64>
+Responses
+200 OK
+
+get
+/api/specialty/{id}
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/specialty/{id}
+updateSpecialty
+path Parameters
+id
+required
+integer <int64>
+Request Body schema: application/json
+required
+name
+required
+string non-empty
+averageDurationMinutes
+required
+integer <int32>
+Responses
+200 OK
+
+put
+/api/specialty/{id}
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/specialty/{id}
+Request samples
+Payload
+Content type
+application/json
+
+Copy
+{
+"name": "string",
+"averageDurationMinutes": 0
+}
+getAllSpecialty
+Responses
+200 OK
+
+get
+/api/specialty
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/specialty
+createSpecialty
+Request Body schema: application/json
+required
+name
+required
+string non-empty
+averageDurationMinutes
+required
+integer <int32>
+Responses
+200 OK
+
+post
+/api/specialty
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/specialty
+Request samples
+Payload
+Content type
+application/json
+
+Copy
+{
+"name": "string",
+"averageDurationMinutes": 0
+}
+Paciente
+getAllPatientsWithSearch
+Authorizations:
+bearerAuth
+query Parameters
+search	
+string
+page	
+integer >= 0
+Default: 0
+Zero-based page index (0..N)
+
+size	
+integer >= 1
+Default: 20
+The size of the page to be returned
+
+sort	
+Array of strings
+Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+
+Responses
+200 OK
+
+get
+/api/patient
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/patient
+updatePatient
+Authorizations:
+bearerAuth
+Request Body schema: multipart/form-data
+firstName	
+string
+lastName	
+string
+birthDate	
+string
+gender	
+string
+Enum: "MALE" "FEMALE" "OTHER"
+phone	
+string
+address	
+string
+photo	
+string <binary>
+Archivo de imagen (jpg, jpeg, png, webp)
+
+deletePhoto	
+boolean
+Indica si se debe eliminar la foto actual
+
+Responses
+200 OK
+
+put
+/api/patient
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/patient
+Completar perfil del paciente
+Este endpoint permite completar o actualizar el perfil básico del paciente durante el proceso de onboarding. Si el paciente aún no tiene un ID FHIR, se crea uno; de lo contrario, se actualiza en el servidor FHIR.
+
+Al finalizar este paso, el paciente cambia su estado a COMPLETED y se le asigna el rol PATIENT.
+
+Authorizations:
+bearerAuth
+Request Body schema: application/json
+required
+firstName
+required
+string non-empty ^[A-Za-zñáéíóúÁÉÍÓÚ]+(?: [A-Za-zñáéíóúÁÉÍÓÚ]+...Show pattern
+Nombre(s) del paciente. Solo se permiten letras (incluye acentos) y espacios.
+
+lastName
+required
+string non-empty ^[A-Za-zñáéíóúÁÉÍÓÚ]+(?: [A-Za-zñáéíóúÁÉÍÓÚ]+...Show pattern
+Apellido(s) del paciente. Solo se permiten letras (incluye acentos) y espacios.
+
+birthDate
+required
+string <date>
+Fecha de nacimiento del paciente en formato ISO (yyyy-MM-dd).
+
+gender
+required
+string
+Enum: "MALE" "FEMALE" "OTHER"
+Género del paciente. Valores permitidos: MALE, FEMALE, OTHER.
+
+phone	
+string^(\+?\d{1,3}[- ]?)?\d{10,15}$
+Número de teléfono del paciente (opcional). Debe tener entre 10 y 15 dígitos.
+
+address	
+string^[\p{L}\p{N}\s,.'#-]{0,200}$
+Dirección del paciente (opcional). Puede incluir letras, números y signos básicos de puntuación.
+
+Responses
+200 Perfil actualizado exitosamente
+400 El flujo de onboarding no corresponde a este paso
+500 Error al conectar con FHIR
+
+post
+/api/patient/onboarding/profile
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/patient/onboarding/profile
+Request samples
+Payload
+Content type
+application/json
+
+Copy
+{
+"firstName": "María Fernanda",
+"lastName": "López García",
+"birthDate": "1990-06-15",
+"gender": "FEMALE",
+"phone": "+52 55 1234 5678",
+"address": "Av. Insurgentes Sur 1234, Col. Roma Norte, CDMX"
+}
+Response samples
+200400500
+Content type
+application/json
+
+Copy
+{
+"firstName": "Juan",
+"lastName": "Pérez",
+"birthDate": "1990-05-10",
+"gender": "MALE",
+"phone": "555-123-4567",
+"address": "Av. Siempre Viva 123"
+}
+Importar datos del paciente desde FHIR
+Este endpoint permite importar información médica del paciente (condiciones, alergias, observaciones, etc.) desde el servidor FHIR asociado a su identificador.
+
+Si el paciente acepta importar todos sus datos (importAll=true), se sincronizan automáticamente con la base de datos local y se completa el proceso de onboarding.
+
+Authorizations:
+bearerAuth
+Request Body schema: application/json
+required
+importAll
+required
+boolean
+Indica si se debe importar toda la información disponible del paciente. Si es 'true', se importarán todos los datos relacionados automáticamente.
+
+Responses
+200 Datos importados correctamente o decisión registrada
+404 No se encontró el paciente en el servidor FHIR
+
+post
+/api/patient/onboarding/import
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/patient/onboarding/import
+Request samples
+Payload
+Content type
+application/json
+
+Copy
+{
+"importAll": true
+}
+Response samples
+200404
+Content type
+application/json
+Example
+
+Importación exitosa
+Importación exitosa
+Importación exitosa
+
+
+Copy
+{
+"status": "success",
+"message": "Datos importados con exito"
+}
+Verificar identificador del paciente
+Este endpoint verifica si un identificador (por ejemplo, CURP, cédula o número de seguro) ya existe en el sistema FHIR o en la base de datos interna.
+
+Si el identificador ya está registrado, se lanza un error. Si no, el sistema intenta buscar el paciente en FHIR y actualiza el estado de onboarding.
+
+Authorizations:
+bearerAuth
+Request Body schema: application/json
+required
+system
+required
+string
+Enum: "CURP" "RFC" "NSS_IMSS" "ISSSTE" "PRIVATE_INSURANCE" "VITALMEDIC_INTERNAL"
+Sistema de identificación del paciente (por ejemplo: CURP, NSS, u otro identificador oficial). Debe coincidir con alguno de los valores permitidos en el enumerado IdentifierSystem.
+
+value
+required
+string non-empty
+Valor del identificador único asociado al sistema seleccionado. Debe corresponder con el formato del identificador según su sistema (por ejemplo, CURP o NSS).
+
+Responses
+200 Identificador verificado correctamente
+400 El identificador ya está registrado
+500 Error al conectar con el servidor FHIR
+
+post
+/api/patient/onboarding/identifier
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/patient/onboarding/identifier
+Request samples
+Payload
+Content type
+application/json
+
+Copy
+{
+"system": "CURP",
+"value": "LOMJ900501HDFRRL09"
+}
+Response samples
+200400500
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"status": "success",
+"message": "Identificador añadido",
+"data": {
+"foundInFhir": true,
+"patientFhir": {}
+}
+}
+getPatienteById
+Authorizations:
+bearerAuth
+path Parameters
+id
+required
+string <uuid>
+Responses
+200 OK
+
+get
+/api/patient/{id}
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/patient/{id}
+Consultar el estado del onboarding del paciente
+Este endpoint devuelve el estado actual del flujo de onboarding del paciente autenticado.
+
+Posibles estados:
+
+PENDING_IDENTIFIER
+IMPORT_PROMPT
+MANUAL_ENTRY
+COMPLETED
+Authorizations:
+bearerAuth
+Responses
+200 Estado obtenido correctamente
+401 Usuario no autenticado
+
+get
+/api/patient/onboarding/status
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/patient/onboarding/status
+Response samples
+200401
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"status": "success",
+"message": "Petición exitosa",
+"data": {
+"status": "IMPORT_PROMPT"
+}
+}
+myProfile
+Authorizations:
+bearerAuth
+Responses
+200 OK
+
+get
+/api/patient/me
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/patient/me
+Horario Doctor
+getDoctorSchedules
+path Parameters
+doctorId
+required
+string <uuid>
+Responses
+200 OK
+
+get
+/api/doctors/{doctorId}/schedules
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/doctors/{doctorId}/schedules
+Actualizar horarios
+Reemplaza todos los horarios del doctor por los nuevos, validando que no se solapen con los existentes.
+
+path Parameters
+doctorId
+required
+string <uuid>
+Request Body schema: application/json
+required
+weeklySchedules
+required
+Array of objects (DoctorScheduleRequest) non-empty
+Responses
+200 OK
+
+put
+/api/doctors/{doctorId}/schedules
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/doctors/{doctorId}/schedules
+Request samples
+Payload
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"weeklySchedules": [
+{}
+]
+}
+createDoctorSchedule
+path Parameters
+doctorId
+required
+string <uuid>
+Request Body schema: application/json
+required
+weeklySchedules
+required
+Array of objects (DoctorScheduleRequest) non-empty
+Responses
+200 OK
+
+post
+/api/doctors/{doctorId}/schedules
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/doctors/{doctorId}/schedules
+Request samples
+Payload
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"weeklySchedules": [
+{}
+]
+}
+Keycloak
+Webhook de Keycloak: sincronización de usuarios
+Este endpoint recibe notificaciones (webhooks) desde Keycloak cuando ocurre un evento relevante, como la creación de un usuario.
+
+Cuando Keycloak envía el evento, el backend procesa el payload y sincroniza los datos en la base de datos local para mantener la consistencia con el servidor de identidad.
+
+⚠️ Este endpoint está diseñado para ser llamado únicamente desde Keycloak, no requiere autenticación de cliente externo.
+
+Authorizations:
+bearerAuth
+Request Body schema: application/json
+required
+id	
+string <uuid>
+Identificador único (UUID) del usuario en Keycloak.
+
+email	
+string
+Correo electrónico asociado al usuario en Keycloak.
+
+username	
+string
+Nombre de usuario (username) del usuario en Keycloak.
+
+Responses
+200 Evento recibido y procesado correctamente
+400 Payload inválido o estructura JSON incorrecta
+403 Acceso no autorizado: el request no proviene de Keycloak
+500 Error interno al procesar el evento
+
+post
+/api/keycloak/webhook
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/keycloak/webhook
+Request samples
+Payload
+Content type
+application/json
+
+Copy
+{
+"id": "550e8400-e29b-41d4-a716-446655440000",
+"email": "user@example.com",
+"username": "john_doe"
+}
+Response samples
+200400403500
+Content type
+application/json
+
+Copy
+{
+"status": "success",
+"message": "Evento recibido y procesado correctamente."
+}
+Citas
+Crea una cita medica
+Crea una cita medica asignada al paciente autenticado
+
+Authorizations:
+bearerAuth
+Request Body schema: application/json
+required
+doctorId	
+string <uuid>
+date	
+string <date>
+startTime	
+string
+type	
+string
+Enum: "PRESENTIAL" "VIRTUAL"
+Responses
+200 OK
+
+post
+/api/appointments
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/appointments
+Request samples
+Payload
+Content type
+application/json
+
+Copy
+{
+"doctorId": "16e2e497-5311-4d5e-9d9e-2722fbc315eb",
+"date": "2019-08-24",
+"startTime": "string",
+"type": "PRESENTIAL"
+}
+updateStatus
+Authorizations:
+bearerAuth
+path Parameters
+id
+required
+integer <int64>
+query Parameters
+status
+required
+string
+Enum: "PROPOSED" "PENDING" "BOOKED" "ARRIVED" "FULFILLED" "CANCELLED" "NOSHOW" "ENTEREDINERROR" "CHECKEDIN" "WAITLIST"
+Responses
+200 OK
+
+patch
+/api/appointments/{id}/status
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/appointments/{id}/status
+Obtener citas de un paciente por fecha
+Retorna todas las citas de un doctor en una fecha específica.
+
+Authorizations:
+bearerAuth
+path Parameters
+patientId
+required
+string <uuid>
+UUID del doctor
+
+query Parameters
+date
+required
+string <date>
+Fecha de la cita en formato YYYY-MM-DD
+
+Responses
+200 OK
+
+get
+/api/appointments/patient/{patientId}
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/appointments/patient/{patientId}
+Obtener citas de un doctor por fecha
+Retorna todas las citas de un doctor en una fecha específica.
+
+Authorizations:
+bearerAuth
+path Parameters
+doctorId
+required
+string <uuid>
+UUID del doctor
+
+query Parameters
+date
+required
+string <date>
+Fecha de la cita en formato YYYY-MM-DD
+
+Responses
+200 OK
+
+get
+/api/appointments/doctor/{doctorId}
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/appointments/doctor/{doctorId}
+Administrador
+Registrar un nuevo doctor en el sistema
+Este endpoint permite a un administrador registrar un nuevo doctor dentro del sistema.
+
+El doctor creado se vincula automáticamente con un usuario en Keycloak y se le asigna el rol DOCTOR. Los datos básicos incluyen nombre, apellido, especialidad, correo electrónico y número de licencia profesional.
+
+El endpoint requiere autenticación con permisos administrativos.
+
+Request Body schema: application/json
+required
+email
+required
+string <email> non-empty
+Correo electrónico del doctor. Debe tener un formato válido.
+
+firstName
+required
+string non-empty ^[A-Za-zñáéíóúÁÉÍÓÚ]+(?: [A-Za-zñáéíóúÁÉÍÓÚ]+...Show pattern
+Nombre(s) del doctor. Solo se permiten letras (incluye acentos) y espacios.
+
+lastName
+required
+string non-empty ^[A-Za-zñáéíóúÁÉÍÓÚ]+(?: [A-Za-zñáéíóúÁÉÍÓÚ]+...Show pattern
+Apellido(s) del doctor. Solo se permiten letras (incluye acentos) y espacios.
+
+specialty
+required
+integer <int64>
+Id de la Especialidad médica del doctor.
+
+licenseNumber
+required
+string non-empty
+Número de licencia médica profesional del doctor.
+
+experience	
+string
+Años de experiencia profesional del doctor (opcional).
+
+phone	
+string
+Número de teléfono de contacto del doctor (opcional).
+
+Responses
+200 Doctor creado exitosamente
+400 Datos inválidos en la solicitud (validación fallida)
+401 El token de autenticación no es válido o ha expirado
+409 Conflicto — ya existe un usuario con el mismo correo electrónico
+
+post
+/api/admin/create-doctor
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/admin/create-doctor
+Request samples
+Payload
+Content type
+application/json
+
+Copy
+{
+"email": "john.doe@example.com",
+"firstName": "John",
+"lastName": "Doe",
+"specialty": 1,
+"licenseNumber": "MED-123456",
+"experience": 10,
+"phone": "+52 55 1234 5678"
+}
+Response samples
+200400401409
+Content type
+application/json
+Respuesta exitosa
+
+
+Copy
+{
+"status": "success",
+"message": "Doctor creado con exito"
+}
+Enum
+getIdentifierSystems
+Responses
+200 OK
+
+get
+/api/enums/identifier-systems
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/enums/identifier-systems
+getAllStatuses
+Responses
+200 OK
+
+get
+/api/enums/appointment-status
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/enums/appointment-status
+clinical-record-controller
+getPatientHistory
+Responses
+200 OK
+
+get
+/api/clinical-history/patient
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/clinical-history/patient
+getPatientHistoryForDoctor
+path Parameters
+patientFhirId
+required
+string
+Responses
+200 OK
+
+get
+/api/clinical-history/doctor/{patientFhirId}
+Generated server url
+
+https://vitalmedic-backend.onrender.com/api/clinical-history/doctor/{patientFhirId}

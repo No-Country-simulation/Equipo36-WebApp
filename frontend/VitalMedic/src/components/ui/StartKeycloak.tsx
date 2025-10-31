@@ -53,9 +53,9 @@ const StartKeycloak = () => {
               
               // Redirigir según el estado del onboarding
               if (status.status === "COMPLETED") {
-                navigate("/dashboard/patient/");
+                navigate("/dashboard/app/patient/");
               } else {
-                navigate("/onboarding");
+                navigate("/dashboard/onboarding");
               }
             } catch (error) {
               // Si hay error al verificar el estado (error 500 del backend), 
