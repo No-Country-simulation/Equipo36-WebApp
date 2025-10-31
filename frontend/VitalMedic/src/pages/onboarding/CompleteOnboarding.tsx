@@ -848,10 +848,9 @@ const CompleteOnboarding: React.FC = () => {
         {/* Content */}
         {state.currentStep === 1 && renderStep1()}
         {state.currentStep === 2 && renderStep2()}
-PS C:\Users\joseo\Documents\Desarrollo de sofware\Equpo36-WebApp\frontend        {state.currentStep === 3 && renderStep3()}
+        {state.currentStep === 3 && renderStep3()}
       </div>
-      
-          </div>
+    </div>
   );
 };
 
