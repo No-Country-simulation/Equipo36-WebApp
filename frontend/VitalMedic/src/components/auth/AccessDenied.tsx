@@ -43,17 +43,17 @@ const AccessDenied: React.FC<AccessDeniedProps> = ({
                 <>
                   <li><a href="/dashboard/admin">📊 Panel de Administración</a></li>
                   <li><a href="/dashboard/doctor">👨‍⚕️ Panel de Doctor</a></li>
-                  <li><a href="/dashboard/patient">👤 Panel de Paciente</a></li>
+                  <li><a href="/dashboard/app/patient">👤 Panel de Paciente</a></li>
                 </>
               )}
               {userRole === 'DOCTOR' && (
                 <>
                   <li><a href="/dashboard/doctor">👨‍⚕️ Panel de Doctor</a></li>
-                  <li><a href="/dashboard/patient">👤 Panel de Paciente</a></li>
+                  <li><a href="/dashboard/app/patient">👤 Panel de Paciente</a></li>
                 </>
               )}
               {userRole === 'PATIENT' && (
-                <li><a href="/dashboard/patient">👤 Panel de Paciente</a></li>
+                <li><a href="/dashboard/app/patient">👤 Panel de Paciente</a></li>
               )}
             </ul>
           </div>

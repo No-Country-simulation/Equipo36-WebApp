@@ -7,23 +7,23 @@ import { useMobileNavigation } from "../../hooks/useMobileNavigation";
 const patientTab = [
   {
     title: "Inicio",
-    path: "/dashboard/patient/",
+    path: "/dashboard/app/patient/",
   },
   {
     title: "Mis Citas",
-    path: "/dashboard/patient/mis-citas",
+    path: "/dashboard/app/patient/mis-citas",
   },
   {
     title: "Médicos",
-    path: "/dashboard/patient/medicos",
+    path: "/dashboard/app/patient/medicos",
   },
   {
     title: "Historial",
-    path: "/dashboard/patient/historial",
+    path: "/dashboard/app/patient/historial",
   },
   {
     title: "Configuración",
-    path: "/dashboard/patient/configuracion",
+    path: "/dashboard/app/patient/configuracion",
   },
 ];
 

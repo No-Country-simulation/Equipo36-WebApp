@@ -40,11 +40,12 @@ export const usePatientData = () => {
     } catch (err: any) {
       console.error('Error fetching patient data:', err);
       
-      // Si hay error 404, significa que el paciente no existe en el backend
-      // pero tenemos datos de Keycloak, usar esos datos
-      if (err.response?.status === 404 && userProfile) {
-        console.log('Patient not found in backend, using Keycloak data');
-        setPatientData({
+      // Manejar diferentes tipos de errores del backend
+      if ((err.response?.status === 404 || err.response?.status === 500) && userProfile) {
+        console.log('Backend error or patient not found, using Keycloak data as fallback');
+        
+        // Usar datos de Keycloak como respaldo
+        const fallbackData = {
           id: userProfile.id || '',
           firstName: userProfile.firstName || '',
           lastName: userProfile.lastName || '',
@@ -53,10 +54,37 @@ export const usePatientData = () => {
           gender: userProfile.gender || '',
           phone: userProfile.phone || '',
           address: userProfile.address || '',
+          curp: '',
+          identifiers: [],
           onboardingStatus: 'PENDING_IDENTIFIER'
-        });
+        };
+        
+        setPatientData(fallbackData);
+        
+        // Solo mostrar error si no tenemos datos de Keycloak
+        if (!userProfile.firstName && !userProfile.lastName) {
+          setError('Error al cargar los datos del paciente');
+        }
       } else {
         setError('Error al cargar los datos del paciente');
+        
+        // Si tenemos userProfile, usar como respaldo incluso en otros errores
+        if (userProfile) {
+          console.log('Using Keycloak data as emergency fallback');
+          setPatientData({
+            id: userProfile.id || '',
+            firstName: userProfile.firstName || '',
+            lastName: userProfile.lastName || '',
+            email: userProfile.email || '',
+            birthDate: userProfile.birthDate || '',
+            gender: userProfile.gender || '',
+            phone: userProfile.phone || '',
+            address: userProfile.address || '',
+            curp: '',
+            identifiers: [],
+            onboardingStatus: 'PENDING_IDENTIFIER'
+          });
+        }
       }
     } finally {
       setLoading(false);

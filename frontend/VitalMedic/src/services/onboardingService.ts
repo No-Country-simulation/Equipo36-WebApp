@@ -262,7 +262,7 @@ export class OnboardingService {
     try {
       // Intentar obtener datos del paciente
       const patientResponse = await apiClient.get<any>(
-        API_CONFIG.ENDPOINTS.PATIENT.GET_PATIENT,
+        API_CONFIG.ENDPOINTS.PATIENT.GET_MY_PROFILE,
       );
 
       return {

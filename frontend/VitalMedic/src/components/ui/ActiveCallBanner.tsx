@@ -17,7 +17,7 @@ export default function ActiveCallBanner({
   const navigate = useNavigate();
 
   const handleJoinCall = () => {
-    navigate(`/dashboard/patient/sala-espera/${appointmentId}`);
+    navigate(`/dashboard/app/patient/sala-espera/${appointmentId}`);
   };
 
   return (

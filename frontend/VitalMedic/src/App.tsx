@@ -15,6 +15,7 @@ import Inicio from "./pages/patient/Inicio";
 import Medicos from "./pages/patient/Medicos";
 import SalaEspera from "./pages/patient/SalaEspera";
 import CompleteOnboarding from "./pages/onboarding/CompleteOnboarding";
+import LandingPage from "./pages/LandingPage";
 import { store } from "./store";
 
 const patientRouter: RouteObject[] = [
@@ -30,6 +31,10 @@ const patientRouter: RouteObject[] = [
 const router = createBrowserRouter([
   {
     path: "/",
+    Component: LandingPage,
+  },
+  {
+    path: "/dashboard",
     Component: StartKeycloak,
     children: [
       {
@@ -44,7 +49,7 @@ const router = createBrowserRouter([
         Component: BaseLayout,
         children: [
           {
-            path: "dashboard",
+            path: "app",
             Component: DashboardLayout,
             children: [
               { 

@@ -115,7 +115,7 @@ const CompleteOnboarding: React.FC = () => {
             break;
           case "COMPLETED":
             // Si ya está completado, redirigir al dashboard
-            navigate("/dashboard/patient");
+            navigate("/dashboard/app/patient");
             return;
           default:
             initialStep = 1;
@@ -396,7 +396,7 @@ const CompleteOnboarding: React.FC = () => {
       }));
 
       // Redirigir inmediatamente al dashboard sin delay
-      navigate("/dashboard/patient");
+      navigate("/dashboard/app/patient");
     } catch (error: any) {
       // MANEJO ROBUSTO DE ERRORES - Si el identificador ya se guardó en el paso 1,
       // consideramos el onboarding como completado funcionalmente
@@ -445,7 +445,7 @@ const CompleteOnboarding: React.FC = () => {
       }
 
       // Redirigir inmediatamente al dashboard sin delay
-      navigate("/dashboard/patient");
+      navigate("/dashboard/app/patient");
     }
   };
 
@@ -462,7 +462,7 @@ const CompleteOnboarding: React.FC = () => {
           currentStep: 3,
           success: "¡Datos médicos importados y registro completado!",
         }));
-        setTimeout(() => navigate("/dashboard/patient"), 3000);
+        setTimeout(() => navigate("/dashboard/app/patient"), 3000);
       } else {
         // No se encontraron datos para importar, continuar con formulario manual
         setState((prev) => ({

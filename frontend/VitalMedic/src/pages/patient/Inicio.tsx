@@ -41,15 +41,15 @@ const Inicio = () => {
   
 
   const handleAgendarCita = () => {
-    navigate("/dashboard/patient/agendar-cita");
+    navigate("/dashboard/app/patient/agendar-cita");
   };
 
   const handleVerHistorial = () => {
-    navigate("/dashboard/patient/historial");
+    navigate("/dashboard/app/patient/historial");
   };
 
   const handleMedicosDisponibles = () => {
-    navigate("/dashboard/patient/medicos");
+    navigate("/dashboard/app/patient/medicos");
   };
 
   return (
@@ -298,7 +298,7 @@ const Inicio = () => {
                     </svg>
                   </div>
                 }
-                onClick={() => navigate("/dashboard/patient/mis-citas")}
+                onClick={() => navigate("/dashboard/app/patient/mis-citas")}
                 className="h-16 md:h-20 xl:h-24"
               />
             </div>

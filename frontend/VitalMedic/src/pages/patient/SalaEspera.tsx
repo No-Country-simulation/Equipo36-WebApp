@@ -41,7 +41,7 @@ export default function SalaEspera() {
   };
 
   const handleBackToDashboard = () => {
-    navigate('/dashboard/patient');
+    navigate('/dashboard/app/patient');
   };
 
   return (
