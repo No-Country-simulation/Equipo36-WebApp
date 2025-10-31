@@ -4,8 +4,15 @@ import { Shield, Clock, Users, CheckCircle, Star, ArrowRight, Phone, Mail, MapPi
 const LandingPage: React.FC = () => {
 
   const handleKeycloakLogin = () => {
-    // Redirect to Keycloak authentication
-    window.location.href = 'https://vitalmedic-auth.onrender.com/realms/VitalMedic/protocol/openid-connect/auth?client_id=vital-medic&redirect_uri=https%3A%2F%2Fequipo36-web-app.vercel.app%2F&state=d216390f-3a38-44c1-8bae-13ccac87441e&response_mode=fragment&response_type=code&scope=openid&nonce=38d0597d-e52c-44cf-98e4-51817cce8338&code_challenge=fmSYGk1wM9eXdhX1o2xurydOtdbN2XomlmxVad32U40&code_challenge_method=S256';
+    // Redirect to Keycloak authentication using proper redirect to /dashboard
+    const keycloakUrl = 'https://vitalmedic-auth.onrender.com';
+    const realm = 'VitalMedic';
+    const clientId = 'vital-medic';
+    const redirectUri = encodeURIComponent(`${window.location.origin}/dashboard`);
+    
+    const authUrl = `${keycloakUrl}/realms/${realm}/protocol/openid-connect/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=openid`;
+    
+    window.location.href = authUrl;
   };
 
   const features = [
