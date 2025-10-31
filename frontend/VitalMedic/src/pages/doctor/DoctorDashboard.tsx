@@ -9,11 +9,6 @@ import DoctorSidebar from '../../components/doctor/DoctorSidebar';
 
 export type TabType = 'dashboard' | 'agenda' | 'patients' | 'historiales' | 'teleconsultas' | 'reportes';
 
-interface DoctorSidebarProps {
-  activeTab: TabType;
-  onTabChange: (tab: TabType) => void;
-}
-
 const DoctorDashboard: React.FC = () => {
   const [doctorProfile, setDoctorProfile] = useState<Doctor | null>(null);
   const [loading, setLoading] = useState(false);
@@ -108,52 +103,6 @@ const DoctorDashboard: React.FC = () => {
     <div className="reportes-section">
       <h3>Reportes</h3>
       <div>Contenido de reportes (mock)</div>
-    </div>
-  );
-
-  const renderProfileTab = () => (
-    <div className="profile-section">
-      <h3>Mi Perfil Profesional</h3>
-      {doctorProfile && (
-        <div className="profile-content">
-          <div className="profile-info">
-            <div className="info-group">
-              <label>Nombre Completo</label>
-              <p>{doctorProfile.firstName} {doctorProfile.lastName}</p>
-            </div>
-            
-            <div className="info-group">
-              <label>Especialidad</label>
-              <p>{doctorProfile.specialty}</p>
-            </div>
-            
-            <div className="info-group">
-              <label>Número de Licencia</label>
-              <p>{doctorProfile.licenseNumber}</p>
-            </div>
-            
-            <div className="info-group">
-              <label>Experiencia</label>
-              <p>{doctorProfile.experience}</p>
-            </div>
-            
-            <div className="info-group">
-              <label>Teléfono</label>
-              <p>{doctorProfile.phone}</p>
-            </div>
-            
-            <div className="info-group">
-              <label>Email</label>
-              <p>{doctorProfile.user.email}</p>
-            </div>
-          </div>
-          
-          <div className="profile-actions">
-            <button className="edit-btn">Editar Perfil</button>
-            <button className="schedule-btn">Configurar Horarios</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 

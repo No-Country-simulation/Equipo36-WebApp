@@ -18,7 +18,7 @@ export class HistoryService {
    */
   static async getAppointmentsByDate(patientId: string, dateIso: string): Promise<PatientAppointmentItem[]> {
     try {
-      const url = `${API_CONFIG.ENDPOINTS.APPOINTMENTS?.PATIENT_BY_DATE || "/api/appointments/patient/"}${patientId}?date=${encodeURIComponent(dateIso)}`;
+      const url = `${API_CONFIG.ENDPOINTS.APPOINTMENTS?.GET_PATIENT_BY_DATE || "/api/appointments/patient/{patientId}"}`.replace('{patientId}', patientId) + `?date=${encodeURIComponent(dateIso)}`;
       const response = await apiClient.get<any>(url);
       const data = response.data?.data ?? response.data ?? [];
 

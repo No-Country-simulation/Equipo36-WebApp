@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { cn } from "clsx-for-tailwind";
 import { useAppSelector } from "../../hooks/reduxHooks";
-import SingleButton from "../../components/ui/Buttons/SingleButton";
 import ConsultaCard from "../../components/ui/Card/ConsultaCard";
 import { HistoryService, type PatientAppointmentItem } from "../../services/historyService";
 import InfoSection from "../../components/ui/Card/InfoSection";
@@ -106,13 +105,13 @@ const HistorialMedico = () => {
       navigate(`/dashboard/patient/sala-espera/${consultaId}`);
     } else {
       // Para otras consultas, mostrar detalles (implementar después)
-      console.log("Ver detalles de consulta:", consultaId);
+      // console.log("Ver detalles de consulta:", consultaId);
     }
   };
 
   const handleExportPDF = () => {
     // Función para exportar a PDF (implementar según necesidades)
-    console.log("Exportando historial médico a PDF...");
+    // console.log("Exportando historial médico a PDF...");
   };
 
   return (

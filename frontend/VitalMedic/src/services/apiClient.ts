@@ -135,10 +135,22 @@ class ApiClient {
   }
 
   private handleError(error: AxiosError): void {
+    console.error("Error de API:", error.response?.status, error.response?.data);
+    
+    const errorData = error.response?.data as any;
+    
     if (error.response?.status === 404) {
       throw new Error("Recurso no encontrado");
     } else if (error.response?.status === 401) {
       throw new Error("No autorizado");
+    } else if (error.response?.status === 409) {
+      // Conflicto - cita duplicada o horario ocupado
+      const message = errorData?.message || errorData?.details?.[0] || "Ya existe una cita en este horario";
+      throw new Error(message);
+    } else if (error.response?.status === 400) {
+      // Bad Request - datos inválidos o doctor no disponible
+      const message = errorData?.message || errorData?.details?.[0] || "Datos inválidos o horario fuera del horario laboral del doctor";
+      throw new Error(message);
     } else if (error.response?.status === 500) {
       throw new Error("Error interno del servidor");
     } else {

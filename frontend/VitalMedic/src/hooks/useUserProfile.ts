@@ -1,5 +1,4 @@
 import { useAppSelector } from "./reduxHooks";
-import type { UserProfile } from "../types/authType";
 
 /**
  * Hook personalizado para obtener y trabajar con los datos del perfil del usuario

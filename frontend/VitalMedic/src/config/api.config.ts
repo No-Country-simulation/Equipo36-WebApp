@@ -29,7 +29,19 @@ export const API_CONFIG = {
 
     // Citas y Consultas (mínimo necesario para historial)
     APPOINTMENTS: {
-      PATIENT_BY_DATE: "/api/appointments/patient/", // se concatena {patientId}?date=YYYY-MM-DD
+      CREATE: "/api/appointments", // POST para crear nueva cita
+      GET_PATIENT_BY_DATE: "/api/appointments/patient/{patientId}", // GET con query param ?date=YYYY-MM-DD
+      GET_DOCTOR_BY_DATE: "/api/appointments/doctor/{doctorId}", // GET con query param ?date=YYYY-MM-DD
+      UPDATE_STATUS: "/api/appointments/{appointmentId}/status", // PUT para actualizar estado
+    },
+
+    // Especialidades
+    SPECIALTY: {
+      GET_ALL: "/api/specialties",
+      GET_BY_ID: "/api/specialties/{id}",
+      CREATE: "/api/specialties",
+      UPDATE: "/api/specialties/{id}",
+      DELETE: "/api/specialties/{id}",
     },
 
     // Admin

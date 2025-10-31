@@ -52,7 +52,7 @@ const Configuracion = () => {
     email: userProfile?.email || "",
     phone: userProfile?.phone || "",
     dateOfBirth: userProfile?.birthDate || "",
-    gender: profileSummary.gender?.toLowerCase() || "",
+    gender: userProfile?.gender?.toLowerCase() || "",
     address: userProfile?.address || "",
     city: "Madrid" // Por defecto, se puede expandir después
   });

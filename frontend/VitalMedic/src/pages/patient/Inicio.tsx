@@ -2,7 +2,6 @@ import { useNavigate } from "react-router";
 import Banner from "../../components/ui/Banner";
 import ActionCard from "../../components/ui/Card/ActionCard";
 import SingleButton from "../../components/ui/Buttons/SingleButton";
-import ActiveCallBanner from "../../components/ui/ActiveCallBanner";
 import { useUserProfile } from "../../hooks/useUserProfile";
 
 const Inicio = () => {

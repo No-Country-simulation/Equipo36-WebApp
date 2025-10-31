@@ -32,6 +32,17 @@ export interface CreateDoctorRequest {
   password: string;
 }
 
+export interface TimeSlot {
+  startTime: string; // HH:mm format
+  endTime: string;   // HH:mm format
+  available: boolean; // true si está disponible, false si está ocupado
+}
+
+export interface DoctorAvailability {
+  date: string; // YYYY-MM-DD format
+  timeSlots: TimeSlot[];
+}
+
 export class DoctorService {
   
   // ✅ Obtener todos los doctores (Funciona sin autenticación)
@@ -80,6 +91,64 @@ export class DoctorService {
     } catch (error) {
       console.error('Error al obtener fechas disponibles:', error);
       return [];
+    }
+  }
+
+  // ✅ Obtener horarios disponibles de un doctor para una fecha específica
+  static async getDoctorAvailability(doctorId: string, date: string): Promise<DoctorAvailability> {
+    try {
+      console.log('📤 Obteniendo availability del doctor:', doctorId, 'para fecha:', date);
+      
+      const url = API_CONFIG.ENDPOINTS.DOCTORS.GET_AVAILABILITY_BY_DATE
+        .replace('{doctorId}', doctorId) + `?date=${date}`;
+      
+      console.log('🔗 URL de la petición:', url);
+
+      const response = await apiClient.get<any>(url);
+      
+      console.log('📥 Respuesta completa del backend:', response);
+      console.log('📥 Status de la respuesta:', response.status);
+      console.log('📥 Headers de la respuesta:', response.headers);
+      
+      // El backend puede devolver diferentes estructuras, normalizamos
+      const data = response.data?.data ?? response.data;
+      
+      console.log('📥 Availability obtenida (data):', typeof data, data);
+      console.log('📥 Contenido completo de data:', JSON.stringify(data, null, 2));
+      console.log('📥 Propiedades de data:', Object.keys(data || {}));
+
+      // El backend devuelve { date: "...", slots: [...] }
+      // Necesitamos mapear 'slots' a 'timeSlots' y procesar la estructura
+      const backendSlots = data.slots || [];
+      console.log('📥 Backend slots:', backendSlots);
+
+      // Convertir la estructura del backend al formato esperado por el frontend
+      const timeSlots = backendSlots.map((slot: any) => ({
+          startTime: slot.startTime,
+          endTime: slot.endTime,
+          available: slot.available,
+          // Agregar otras propiedades que pueda necesitar el frontend
+          id: `${slot.startTime}-${slot.endTime}`,
+          date: data.date
+      }));
+
+      console.log('📥 timeSlots procesados:', timeSlots);
+
+      return {
+          date: data.date || date,
+          timeSlots
+      };
+    } catch (error) {
+      console.error('❌ Error al obtener availability del doctor:', error);
+      console.error('❌ Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        status: (error as any)?.response?.status,
+        data: (error as any)?.response?.data
+      });
+      return {
+        date: date,
+        timeSlots: []
+      };
     }
   }
 
