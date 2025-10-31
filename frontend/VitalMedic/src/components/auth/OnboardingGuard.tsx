@@ -35,14 +35,12 @@ const OnboardingGuard: React.FC<OnboardingGuardProps> = ({ children }) => {
 
       // Si ya está en la página de onboarding, no redirigir
       if (location.pathname === '/onboarding') {
-        console.log('📍 OnboardingGuard: Usuario ya en onboarding, no redirigir');
         setIsCheckingOnboarding(false);
         return;
       }
 
       // PRIORIDAD 1: Si hay un error de backend previo, permitir acceso inmediatamente
       if (isBackendErrorFlagSet()) {
-        console.log('🔓 OnboardingGuard: Backend con error previo, permitiendo acceso inmediato');
         setBackendError(true);
         setNeedsOnboarding(false);
         setIsCheckingOnboarding(false);
@@ -50,26 +48,17 @@ const OnboardingGuard: React.FC<OnboardingGuardProps> = ({ children }) => {
       }
 
       try {
-        console.log('🔍 OnboardingGuard: Verificando estado del onboarding...');
-        
         const statusResponse = await OnboardingService.getOnboardingStatus();
         const onboardingStatus = statusResponse.status;
-        
-        console.log('📊 OnboardingGuard: Estado actual:', onboardingStatus);
 
         // Si el onboarding no está completado, necesita completarlo
         if (onboardingStatus !== 'COMPLETED') {
-          console.log('🔄 OnboardingGuard: Redirigiendo a onboarding...');
           setNeedsOnboarding(true);
         } else {
-          console.log('✅ OnboardingGuard: Onboarding completado, permitiendo acceso');
           setNeedsOnboarding(false);
         }
       } catch (error: any) {
-        console.warn('⚠️ OnboardingGuard: Error al verificar estado:', error.message);
-        
         // En caso de error del backend, marcar como error y permitir acceso
-        console.log('🔄 OnboardingGuard: Error del backend, permitiendo acceso (usuario puede completar onboarding manualmente)');
         setBackendErrorFlag();
         setBackendError(true);
         setNeedsOnboarding(false);
@@ -88,18 +77,15 @@ const OnboardingGuard: React.FC<OnboardingGuardProps> = ({ children }) => {
 
   // PRIORIDAD 1: Si hay error del backend, permitir acceso para evitar bucles
   if (backendError) {
-    console.log('🔓 OnboardingGuard: Backend fallando, permitiendo acceso');
     return <>{children}</>;
   }
 
   // Si necesita onboarding, redirigir
   if (needsOnboarding) {
-    console.log('🔄 OnboardingGuard: Redirigiendo a onboarding...');
     return <Navigate to="/onboarding" replace />;
   }
 
   // Si no necesita onboarding, mostrar el contenido protegido
-  console.log('✅ OnboardingGuard: Permitiendo acceso al dashboard');
   return <>{children}</>;
 };
 

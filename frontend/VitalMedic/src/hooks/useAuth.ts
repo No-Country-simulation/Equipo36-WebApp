@@ -56,7 +56,6 @@ export const useAuth = () => {
       const statusResponse = await OnboardingService.getOnboardingStatus();
       setOnboardingStatus(statusResponse.status);
     } catch (error) {
-      console.warn("Error al verificar estado del onboarding:", error);
       setOnboardingStatus("PENDING_IDENTIFIER"); // Asumir estado inicial
     } finally {
       setIsCheckingOnboarding(false);

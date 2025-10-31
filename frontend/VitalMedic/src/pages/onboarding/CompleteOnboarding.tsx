@@ -7,7 +7,6 @@ import {
 } from "../../services/onboardingService";
 import { useAuth } from "../../hooks/useAuth";
 import { isBackendErrorFlagSet, setBackendErrorFlag, clearBackendErrorFlag } from "../../utils/onboardingUtils";
-import OnboardingDebug from "../../components/debug/OnboardingDebug";
 import BackendStatusBanner from "../../components/ui/BackendStatusBanner";
 import { useAppDispatch } from "../../hooks/reduxHooks";
 import { updateUserProfile } from "../../features/auth/authSlice";
@@ -91,7 +90,6 @@ const CompleteOnboarding: React.FC = () => {
     const checkOnboardingStatus = async () => {
       // PRIORIDAD 1: Si ya hay un error de backend previo, no verificar nuevamente
       if (isBackendErrorFlagSet()) {
-        console.log("⚠️ CompleteOnboarding: Backend con error previo, iniciando en paso 1 sin verificar API");
         setState((prev) => ({
           ...prev,
           currentStep: 1,
@@ -101,12 +99,8 @@ const CompleteOnboarding: React.FC = () => {
       }
 
       try {
-        console.log("🔍 CompleteOnboarding: Verificando estado del onboarding...");
-        
         const statusResponse = await OnboardingService.getOnboardingStatus();
         const currentStatus = statusResponse.status;
-        
-        console.log("📊 CompleteOnboarding: Estado actual:", currentStatus);
 
         // Determinar el paso inicial basado en el estado
         let initialStep: 1 | 2 | 3 = 1;
@@ -132,11 +126,8 @@ const CompleteOnboarding: React.FC = () => {
           currentStep: initialStep,
         }));
 
-        console.log(`🎯 CompleteOnboarding: Iniciando en paso ${initialStep}`);
       } catch (error: any) {
-        console.warn("⚠️ CompleteOnboarding: Error al verificar estado:", error.message);
         // En caso de error, marcar backend como fallando y guardar flag
-        console.log("🔄 CompleteOnboarding: Marcando backend como fallando y guardando flag");
         setBackendErrorFlag();
         setState((prev) => ({
           ...prev,
@@ -381,16 +372,10 @@ const CompleteOnboarding: React.FC = () => {
     try {
       setState((prev) => ({ ...prev, loading: true, error: null }));
 
-      console.log("💾 CompleteOnboarding: Actualizando perfil...");
-      console.log("📤 CompleteOnboarding: Datos a enviar:", state.profileData);
-      
       // Intentar actualizar el perfil directamente
       await OnboardingService.updateProfile(state.profileData);
 
-      console.log("✅ CompleteOnboarding: Perfil actualizado exitosamente");
-
       // Actualizar el perfil del usuario en Redux con los datos del onboarding
-      console.log("🔄 CompleteOnboarding: Actualizando perfil en Redux...");
       dispatch(updateUserProfile({
         firstName: state.profileData.firstName,
         lastName: state.profileData.lastName,
@@ -401,7 +386,6 @@ const CompleteOnboarding: React.FC = () => {
       }));
 
       // Limpiar flag de error del backend al completar exitosamente
-      console.log("🧹 CompleteOnboarding: Limpiando flag de error del backend");
       clearBackendErrorFlag();
 
       setState((prev) => ({
@@ -414,15 +398,12 @@ const CompleteOnboarding: React.FC = () => {
       // Redirigir inmediatamente al dashboard sin delay
       navigate("/dashboard/patient");
     } catch (error: any) {
-      console.warn("⚠️ CompleteOnboarding: Error al actualizar perfil:", error.message);
-      
       // MANEJO ROBUSTO DE ERRORES - Si el identificador ya se guardó en el paso 1,
       // consideramos el onboarding como completado funcionalmente
       const status = error.response?.status;
       
       if (status === 400 && error.response?.data?.message?.includes("flujo de onboarding")) {
         // Error específico del backend - el usuario ya completó el onboarding
-        console.log("🧹 CompleteOnboarding: Limpiando flag de error del backend (onboarding ya completado)");
         
         // Actualizar el perfil del usuario en Redux también en caso de error
         dispatch(updateUserProfile({
@@ -443,7 +424,6 @@ const CompleteOnboarding: React.FC = () => {
         }));
       } else {
         // Otros errores - asumir que el identificador se guardó correctamente
-        console.log("🧹 CompleteOnboarding: Limpiando flag de error del backend (identificador guardado)");
         
         // Actualizar el perfil del usuario en Redux también en caso de error
         dispatch(updateUserProfile({
@@ -869,13 +849,6 @@ const CompleteOnboarding: React.FC = () => {
         {state.currentStep === 1 && renderStep1()}
         {state.currentStep === 2 && renderStep2()}
         {state.currentStep === 3 && renderStep3()}
-
-        {/* Debug Component - Solo en desarrollo */}
-        {import.meta.env.DEV && (
-          <div className="mt-8">
-            <OnboardingDebug />
-          </div>
-        )}
       </div>
       
           </div>

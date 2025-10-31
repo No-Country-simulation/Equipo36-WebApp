@@ -44,44 +44,31 @@ const StartKeycloak = () => {
           // Verificar si el usuario es PACIENTE y necesita onboarding
           const roles = keycloakClient.tokenParsed?.resource_access?.[VITE_KEYCLOAK_CLIENT_ID]?.roles || [];
           
-          console.log("🔍 Debug StartKeycloak:");
-          console.log("Roles del usuario:", roles);
-          console.log("Cliente ID:", VITE_KEYCLOAK_CLIENT_ID);
-          
           // TEMPORAL: Permitir que cualquier usuario autenticado vaya al onboarding
           // En producción, esto debe ser: if (roles.includes("PATIENT")) {
           if (true) { // Forzar onboarding para cualquier usuario en desarrollo
-            console.log("✅ Usuario autenticado, verificando onboarding (temporal para desarrollo)...");
             try {
               // Importar dinámicamente para evitar dependencia circular
               const { OnboardingService } = await import("../../services/onboardingService");
               const status = await OnboardingService.getOnboardingStatus();
               
-              console.log("Estado del onboarding:", status);
-              
               // Redirigir según el estado del onboarding
               if (status.status === "COMPLETED") {
-                console.log("🎯 Redirigiendo a dashboard/patient (onboarding completado)");
                 navigate("/dashboard/patient/");
               } else {
-                console.log("🎯 Redirigiendo a /onboarding (estado:", status.status + ")");
                 navigate("/onboarding");
               }
             } catch (error) {
               // Si hay error al verificar el estado (error 500 del backend), 
               // ir directamente a onboarding para permitir que el usuario se registre
-              console.warn("❌ Error 500 del backend, redirigiendo a /onboarding para nuevo registro", error);
               navigate("/onboarding");
             }
           } else {
             // Para otros roles (DOCTOR, ADMIN), ir al dashboard general
-            console.log("❌ Usuario no es PACIENTE, redirigiendo a /dashboard general");
-            console.log("Roles disponibles:", roles);
             navigate("/dashboard");
           }
         }
       } catch (error) {
-        console.error("Error fatal al inicializar Keycloak", error);
         dispatchAuth(initializedToTrue());
       }
     };

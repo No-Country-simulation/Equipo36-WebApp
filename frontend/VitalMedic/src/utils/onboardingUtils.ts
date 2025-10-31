@@ -32,14 +32,3 @@ export const resetOnboardingState = (): void => {
   clearBackendErrorFlag();
   // Aquí se pueden agregar más limpiezas si es necesario
 };
-
-/**
- * Función de utilidad para debugging del onboarding
- */
-export const getOnboardingDebugInfo = () => {
-  return {
-    backendErrorFlag: isBackendErrorFlagSet(),
-    localStorageKeys: Object.keys(localStorage).filter(key => key.includes('onboarding')),
-    timestamp: new Date().toISOString()
-  };
-};

@@ -57,7 +57,6 @@ export class OnboardingService {
       // El backend retorna ApiResult.success con los datos
       return response.data.data;
     } catch (error: any) {
-      console.warn("No se pudo obtener estado del onboarding:", error.message);
       // Si falla, asumir que está en PENDING_IDENTIFIER para ser más estricto
       return { status: "PENDING_IDENTIFIER" };
     }
@@ -95,7 +94,6 @@ export class OnboardingService {
 
       // Error de conexión con FHIR - permitir continuar manualmente
       if (status === 500 && errorCode === "FHIR_CONNECTION_ERROR") {
-        console.warn("Error de FHIR, permitiendo continuar manualmente");
         return {
           foundInFhir: false,
           patientFhir: null,
@@ -109,7 +107,6 @@ export class OnboardingService {
 
       // Para otros errores 500 o 404, permitir continuar manualmente
       if (status >= 500 || status === 404) {
-        console.warn("Error del servidor, permitiendo continuar manualmente");
         return {
           foundInFhir: false,
           patientFhir: null,
@@ -185,7 +182,6 @@ export class OnboardingService {
 
       // Error de FHIR - permitir continuar con datos básicos
       if (status === 500 && error.response?.data?.errorCode === "FHIR_CONNECTION_ERROR") {
-        console.warn("Error de FHIR en perfil, guardando datos localmente");
         return {
           firstName: profileData.firstName,
           lastName: profileData.lastName,
@@ -198,7 +194,6 @@ export class OnboardingService {
 
       // Para otros errores 500 o 404, permitir continuar con datos básicos
       if (status >= 500 || status === 404) {
-        console.warn("Error del servidor en perfil, guardando datos localmente");
         return {
           firstName: profileData.firstName,
           lastName: profileData.lastName,
@@ -247,7 +242,6 @@ export class OnboardingService {
       }
 
       // Otros errores - permitir continuar manualmente
-      console.warn("Error al importar datos FHIR:", error.response?.data?.message);
       return {
         success: false,
         message: "No se pudieron importar datos médicos, continuando manualmente",
