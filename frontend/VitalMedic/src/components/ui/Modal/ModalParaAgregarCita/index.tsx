@@ -3,7 +3,7 @@ import { useReducer } from "react";
 import { ContextoRegistrarCita } from "../../../../contexts/ContextoRegistrarCita";
 import { toggleNewAppointment } from "../../../../features/modal/modalSlice";
 import { useAppDispatch } from "../../../../hooks/reduxHooks";
-import { diaAFecha } from "../../../../utils/fecha";
+
 import { AppointmentService, type CreateAppointmentRequest } from "../../../../services/appointmentService";
 import SingleButton from "../../Buttons/SingleButton";
 import ContenidoDeEstado from "./ContenidoDeEstado";

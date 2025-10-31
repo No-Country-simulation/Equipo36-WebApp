@@ -8,7 +8,6 @@ import {
 import { useAppDispatch } from "../../hooks/reduxHooks";
 import type { UserProfile } from "../../types/authType";
 import keycloakClient from "../../utils/keycloak";
-import { VITE_KEYCLOAK_CLIENT_ID } from "../../utils/keycloak";
 
 const StartKeycloak = () => {
   const navigate = useNavigate();
@@ -42,7 +41,7 @@ const StartKeycloak = () => {
           );
 
           // Verificar si el usuario es PACIENTE y necesita onboarding
-          const roles = keycloakClient.tokenParsed?.resource_access?.[VITE_KEYCLOAK_CLIENT_ID]?.roles || [];
+          // const roles = keycloakClient.tokenParsed?.resource_access?.[VITE_KEYCLOAK_CLIENT_ID]?.roles || [];
           
           // TEMPORAL: Permitir que cualquier usuario autenticado vaya al onboarding
           // En producción, esto debe ser: if (roles.includes("PATIENT")) {

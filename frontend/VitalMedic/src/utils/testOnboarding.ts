@@ -4,11 +4,11 @@ import { OnboardingService } from "../services/onboardingService";
 export const testOnboardingFlow = async () => {
   try {
     // 1. Verificar estado inicial
-    const initialStatus = await OnboardingService.getOnboardingStatus();
+    await OnboardingService.getOnboardingStatus();
 
     // 2. Probar envío de identificador (ejemplo con CURP)
     try {
-      const identifierResponse = await OnboardingService.submitIdentifier({
+      await OnboardingService.submitIdentifier({
         system: "CURP",
         value: "GODE561231MVZRRL04"
       });
@@ -17,11 +17,11 @@ export const testOnboardingFlow = async () => {
     }
 
     // 3. Verificar estado después del identificador
-    const afterIdentifierStatus = await OnboardingService.getOnboardingStatus();
+    await OnboardingService.getOnboardingStatus();
 
     // 4. Probar actualización de perfil
     try {
-      const profileResponse = await OnboardingService.updateProfile({
+      await OnboardingService.updateProfile({
         firstName: "Juan",
         lastName: "Pérez",
         birthDate: "1990-05-15",
@@ -34,7 +34,7 @@ export const testOnboardingFlow = async () => {
     }
 
     // 5. Verificar estado final
-    const finalStatus = await OnboardingService.getOnboardingStatus();
+    await OnboardingService.getOnboardingStatus();
 
   } catch (error: any) {
     // Error en las pruebas
