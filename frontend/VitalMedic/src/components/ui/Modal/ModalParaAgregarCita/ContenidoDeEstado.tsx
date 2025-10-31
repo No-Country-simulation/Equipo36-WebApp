@@ -4,13 +4,14 @@ import type { ReactNode } from "react";
 const ESTILO_ESPECIALIDAD = ["w-full", "grid grid-cols-3 gap-3"];
 const ESTILO_MEDICO = ["w-full", "flex flex-wrap justify-around gap-y-2.5"];
 const ESTILO_TIPO_CITA = ["flex gap-5"];
+const ESTILO_FECHA = ["flex flex-col items-center gap-3", "w-3/4"];
 const ESTILO_DE_ENVIO = [
   "w-full",
   "flex flex-col items-center flex-wrap gap-10",
 ];
 
 interface Props {
-  variante: "especialidad" | "medico-o-fecha" | "tipo-cita" | "envio";
+  variante: "especialidad" | "medico" | "fecha" | "tipo-cita" | "envio";
   children: ReactNode;
   cargandoContenido?: boolean;
   estado: {
@@ -38,9 +39,10 @@ const ContenidoDeEstado = ({
     <div
       className={cn(
         variante === "especialidad" && ESTILO_ESPECIALIDAD,
-        variante === "medico-o-fecha" && ESTILO_MEDICO,
+        variante === "medico" && ESTILO_MEDICO,
+        variante === "fecha" && ESTILO_FECHA,
         variante === "tipo-cita" && ESTILO_TIPO_CITA,
-        variante === "envio" && ESTILO_DE_ENVIO
+        variante === "envio" && ESTILO_DE_ENVIO,
       )}
     >
       {children}

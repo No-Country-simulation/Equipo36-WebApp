@@ -4,22 +4,46 @@ import { ContextoRegistrarCita } from "../../../../contexts/ContextoRegistrarCit
 import useFetchFecha from "../../../../hooks/useFetchFecha";
 import BotonParaCitas from "../../Buttons/BotonParaCitas";
 
+interface TimeBlock {
+  id: number;
+  startTime: string;
+  endTime: string;
+  active: boolean;
+}
+
+const DiaAlEspañol: Record<string, string> = {
+  MONDAY: "lunes",
+  TUESDAY: "martes",
+  WEDNESDAY: "miercoles",
+  THURSDAY: "jueves",
+  FRIDAY: "viernes",
+  SATURDAY: "sábado",
+  SUNDAY: "domingo",
+} as const;
+
 interface FechaProps {
   fecha: string;
-  hora?: string;
+  timeBlock: TimeBlock;
 }
-const Fecha = ({ fecha, hora }: FechaProps) => {
+const Fecha = ({ timeBlock, fecha }: FechaProps) => {
   const { state, dispatch } = useContext(ContextoRegistrarCita);
 
   let selecionado = false;
-  const fechaSelecionado = state.datosParaRegistrarCita.fecha;
+  const fechaSelecionada = state.datosParaRegistrarCita.fecha;
+  const horaSelecionada = state.datosParaRegistrarCita.hora;
 
-  if (fechaSelecionado === fecha) {
+  if (fechaSelecionada === fecha && horaSelecionada === timeBlock.startTime) {
     selecionado = true;
   }
 
   const manejarClick = () => {
-    dispatch({ type: "cambiar-fecha-a", payload: fecha });
+    dispatch({
+      type: "cambiar-fecha-y-hora-a",
+      payload: {
+        fecha: fecha,
+        hora: timeBlock.startTime,
+      },
+    });
   };
 
   return (
@@ -28,8 +52,8 @@ const Fecha = ({ fecha, hora }: FechaProps) => {
       selecionado={selecionado}
       onClick={manejarClick}
     >
-      <b>{fecha}</b>
-      <p>{hora}</p>
+      <span>{timeBlock.startTime}</span>
+      <span> {timeBlock.endTime}</span>
     </BotonParaCitas>
   );
 };
@@ -52,7 +76,23 @@ const ListaFechas = () => {
   }
 
   const Lista = fechas.map((fecha) => (
-    <Fecha key={`fecha-${fecha.date}`} fecha={fecha.date} hora="12:00 a.m." />
+    <div
+      key={`dia-de-fecha-${fecha.weekDay}`}
+      className={cn("w-full", "flex justify-between items-center")}
+    >
+      <h3 className={cn("w-[150px]", "text-center font-bold capitalize")}>
+        {DiaAlEspañol[fecha.weekDay]}
+      </h3>
+      <div className={cn("flex justify-start gap-3")}>
+        {fecha.timeBlocks.map((horario) => (
+          <Fecha
+            key={`horaio-${horario.id}`}
+            fecha={fecha.weekDay}
+            timeBlock={horario}
+          />
+        ))}
+      </div>
+    </div>
   ));
 
   return Lista;

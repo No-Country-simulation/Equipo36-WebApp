@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { cn } from "clsx-for-tailwind";
 import { useAppSelector } from "../../hooks/reduxHooks";
-// import SingleButton from "../../components/ui/Buttons/SingleButton";
+import SingleButton from "../../components/ui/Buttons/SingleButton";
 import ConsultaCard from "../../components/ui/Card/ConsultaCard";
 import { HistoryService, type PatientAppointmentItem } from "../../services/historyService";
 import InfoSection from "../../components/ui/Card/InfoSection";
