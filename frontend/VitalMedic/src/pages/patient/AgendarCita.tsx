@@ -14,25 +14,25 @@ const doctors = [
     id: 1,
     name: "Dra. María González",
     specialty: "Cardiología",
-    image: "https://via.placeholder.com/80/4ade80/ffffff?text=MG",
+    image: "/images/doctor-mg.svg",
   },
   {
     id: 2,
     name: "Dr. Carlos Mendoza",
     specialty: "Pediatría",
-    image: "https://via.placeholder.com/80/3b82f6/ffffff?text=CM",
+    image: "/images/doctor-cm.svg",
   },
   {
     id: 3,
     name: "Dra. Ana Martínez",
     specialty: "Dermatología",
-    image: "https://via.placeholder.com/80/f59e0b/ffffff?text=AM",
+    image: "/images/doctor-am.svg",
   },
   {
     id: 4,
     name: "Dr. Roberto Fernández",
     specialty: "Medicina General",
-    image: "https://via.placeholder.com/80/8b5cf6/ffffff?text=RF",
+    image: "/images/doctor-rf.svg",
   },
 ];
 

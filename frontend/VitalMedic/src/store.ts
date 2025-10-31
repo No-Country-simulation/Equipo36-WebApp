@@ -7,6 +7,25 @@ export const store = configureStore({
     modal: modalReducer,
     auth: authReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        // Ignorar estas rutas de acción para valores no serializables
+        ignoredActions: [
+          'auth/setKeycloak',
+          'auth/startAuth',
+          'auth/loginSuccess',
+          'auth/logout',
+        ],
+        // Ignorar estas rutas de estado para valores no serializables
+        ignoredPaths: [
+          'auth.keycloak',
+          'auth.keycloak.token',
+          'auth.keycloak.refreshToken',
+          'auth.keycloak.idToken',
+        ],
+      },
+    }),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

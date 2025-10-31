@@ -1,8 +1,10 @@
 import { Provider } from "react-redux";
 import { createBrowserRouter, type RouteObject } from "react-router";
 import { RouterProvider } from "react-router/dom";
+import { Outlet } from "react-router";
 import BaseLayout from "./components/layout/BaseLayout";
 import DashboardLayout from "./components/layout/DashboardLayout";
+import OnboardingGuard from "./components/auth/OnboardingGuard";
 import CargandoPagina from "./components/ui/CargandoPagina";
 import StartKeycloak from "./components/ui/StartKeycloak";
 import AgendarCita from "./pages/patient/AgendarCita";
@@ -10,13 +12,15 @@ import Appointment from "./pages/patient/Appointment";
 import Configuracion from "./pages/patient/Configuracion";
 import HistorialMedico from "./pages/patient/HistorialMedico";
 import Inicio from "./pages/patient/Inicio";
+import Medicos from "./pages/patient/Medicos";
 import SalaEspera from "./pages/patient/SalaEspera";
+import CompleteOnboarding from "./pages/onboarding/CompleteOnboarding";
 import { store } from "./store";
 
 const patientRouter: RouteObject[] = [
   { index: true, Component: Inicio },
   { path: "mis-citas", Component: Appointment },
-  { path: "medicos", element: <p>médico</p> },
+  { path: "medicos", Component: Medicos },
   { path: "historial", Component: HistorialMedico },
   { path: "configuracion", Component: Configuracion },
   { path: "agendar-cita", Component: AgendarCita },
@@ -33,12 +37,26 @@ const router = createBrowserRouter([
         Component: CargandoPagina,
       },
       {
+        path: "onboarding",
+        Component: CompleteOnboarding,
+      },
+      {
         Component: BaseLayout,
         children: [
           {
             path: "dashboard",
             Component: DashboardLayout,
-            children: [{ path: "patient", children: patientRouter }],
+            children: [
+              { 
+                path: "patient", 
+                element: (
+                  <OnboardingGuard>
+                    <Outlet />
+                  </OnboardingGuard>
+                ),
+                children: patientRouter
+              },
+            ],
           },
         ],
       },

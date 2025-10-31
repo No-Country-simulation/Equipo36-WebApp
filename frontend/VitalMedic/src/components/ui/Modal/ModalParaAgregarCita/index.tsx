@@ -2,14 +2,15 @@ import { cn } from "clsx-for-tailwind";
 import { useReducer } from "react";
 import { ContextoRegistrarCita } from "../../../../contexts/ContextoRegistrarCita";
 import { toggleNewAppointment } from "../../../../features/modal/modalSlice";
-import { useAppDispatch, useAppSelector } from "../../../../hooks/reduxHooks";
+import { useAppDispatch } from "../../../../hooks/reduxHooks";
 import { diaAFecha } from "../../../../utils/fecha";
+import { AppointmentService, type CreateAppointmentRequest } from "../../../../services/appointmentService";
 import SingleButton from "../../Buttons/SingleButton";
 import ContenidoDeEstado from "./ContenidoDeEstado";
 import DatosAEnviar from "./DatosAEviar";
 import ListaDeEspecialidades from "./ListaDeEspecialidades";
 import ListaDeMedicos from "./ListaDeMedicos";
-import ListaFechas from "./ListaFechas";
+import ListaHorariosDisponibles from "./ListaHorariosDisponibles";
 import Progreso from "./Progreso";
 import { reducer, type State } from "./reduce";
 import TipoDeCita from "./TipoDeCita";
@@ -51,7 +52,7 @@ const estadoInicial: State = {
 const ModalParaAgregarCita = () => {
   const dispatchAddAppoinmentModal = useAppDispatch();
   const [state, dispatch] = useReducer(reducer, estadoInicial);
-  const accessToken = useAppSelector((state) => state.auth.keycloak?.token);
+  // const accessToken = useAppSelector((state) => state.auth.keycloak?.token);
   // const userProfile = useAppSelector((state) => state.auth.userProfile);
 
   return (
@@ -104,7 +105,7 @@ const ModalParaAgregarCita = () => {
               variante="fecha"
               estado={{ actual: state.estadoActual, requerido: 3 }}
             >
-              <ListaFechas />
+              <ListaHorariosDisponibles />
             </ContenidoDeEstado>
 
             <ContenidoDeEstado
@@ -147,7 +148,7 @@ const ModalParaAgregarCita = () => {
 
                         case 1:
                           if (
-                            state.datosParaRegistrarCita?.doctor?.id === null
+                            state.datosParaRegistrarCita.doctor === null
                           ) {
                             alert("Debe escojer una opción");
                             break;
@@ -185,44 +186,62 @@ const ModalParaAgregarCita = () => {
               {state.estadoActual === 4 && (
                 <SingleButton
                   variant="primary"
-                  onClick={() => {
-                    const nuevaCita = {
-                      doctorId: state.datosParaRegistrarCita.doctor?.id,
-                      date: diaAFecha(state.datosParaRegistrarCita.fecha),
-                      startTime: state.datosParaRegistrarCita.hora,
-                      type: state.datosParaRegistrarCita.tipoDeCita?.toUpperCase(),
+                  onClick={async () => {
+                    // Validar que todos los datos requeridos estén presentes
+                    if (!state.datosParaRegistrarCita.doctor?.id) {
+                      alert("Por favor selecciona un doctor");
+                      return;
+                    }
+                    
+                    if (!state.datosParaRegistrarCita.fecha) {
+                      alert("Por favor selecciona una fecha");
+                      return;
+                    }
+                    
+                    if (!state.datosParaRegistrarCita.hora) {
+                      alert("Por favor selecciona una hora");
+                      return;
+                    }
+                    
+                    if (!state.datosParaRegistrarCita.tipoDeCita) {
+                      alert("Por favor selecciona un tipo de cita");
+                      return;
+                    }
+
+                    // La fecha ya viene en formato ISO (YYYY-MM-DD) desde el estado
+                    const fechaFormateada = state.datosParaRegistrarCita.fecha;
+                    if (!fechaFormateada) {
+                      alert("Error: fecha no válida. Por favor intenta de nuevo.");
+                      return;
+                    }
+
+                    // Mapear el tipo de cita al formato esperado por el backend
+                    const tipoMapeado = state.datosParaRegistrarCita.tipoDeCita.toLowerCase() === 'presencial' 
+                      ? 'PRESENTIAL' 
+                      : 'VIRTUAL';
+
+                    // Formatear la hora al formato HH:mm (sin segundos) que espera el backend
+                    const horaFormateada = state.datosParaRegistrarCita.hora.substring(0, 5); // "15:30:00" -> "15:30"
+
+                    const appointmentData: CreateAppointmentRequest = {
+                      doctorId: state.datosParaRegistrarCita.doctor.id,
+                      date: fechaFormateada,
+                      startTime: horaFormateada,
+                      type: tipoMapeado as 'PRESENTIAL' | 'VIRTUAL',
                     };
 
-                    fetch(
-                      "https://vitalmedic-backend.onrender.com/api/appointments",
-                      {
-                        method: "POST",
-                        headers: {
-                          Authorization: `Bearer ${accessToken}`,
-                          "Content-type": "application/json",
-                        },
-                        body: JSON.stringify(nuevaCita),
-                      },
-                    )
-                      .then((resp) => {
-                        if (!resp.ok) {
-                          console.log("Algo va mal", resp.status);
-                          throw new Error("Error del servidor");
-                        }
+                    console.log("Datos a enviar:", appointmentData);
+                    console.log("Estado completo:", state.datosParaRegistrarCita);
 
-                        return resp.json();
-                      })
-
-                      .then(() => {
-                        alert("Envio exitoso");
-                        dispatchAddAppoinmentModal(toggleNewAppointment());
-                      })
-
-                      .catch((err) => {
-                        alert("No se completó el envío");
-                        dispatchAddAppoinmentModal(toggleNewAppointment());
-                        console.log(err);
-                      });
+                    try {
+                      const result = await AppointmentService.createAppointment(appointmentData);
+                      console.log("Cita creada exitosamente:", result);
+                      alert("Cita registrada exitosamente");
+                      dispatchAddAppoinmentModal(toggleNewAppointment());
+                    } catch (error) {
+                      console.error("Error al crear la cita:", error);
+                      alert("Error al registrar la cita. Por favor intenta de nuevo.");
+                    }
                   }}
                 >
                   Registrar cita

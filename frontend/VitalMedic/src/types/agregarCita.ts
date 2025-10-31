@@ -9,6 +9,10 @@ export interface Doctor {
   firstName: string;
   lastName: string;
   specialty: string;
+  licenseNumber?: string;
+  experience?: string;
+  phone?: string;
+  email?: string;
 }
 
 export type RespEspecialidad = Promise<{

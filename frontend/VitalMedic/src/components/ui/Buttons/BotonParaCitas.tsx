@@ -38,12 +38,16 @@ interface Props {
   children: ReactNode;
   selecionado?: boolean;
   onClick?: () => void;
+  disabled?: boolean;
+  className?: string;
 }
 const BotonParaCitas = ({
   variante,
   children,
   onClick,
   selecionado = false,
+  disabled = false,
+  className = "",
 }: Props) => {
   return (
     <button
@@ -53,9 +57,11 @@ const BotonParaCitas = ({
         variante === "tipo-de-cita" && ESTILO_TIPO_DE_CITA,
         variante === "fecha" && ESTILO_FECHA,
         selecionado && "bg-blue-200",
+        className,
       )}
       type="button"
       onClick={onClick}
+      disabled={disabled}
     >
       {children}
     </button>

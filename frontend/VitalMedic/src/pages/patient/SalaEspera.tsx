@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import VideoCall from "../../components/ui/VideoCall";
-import { cn } from "clsx-for-tailwind";
 
 // Mock data - después se reemplazará con datos del backend
 const mockAppointment = {
@@ -17,11 +16,9 @@ const mockAppointment = {
 };
 
 export default function SalaEspera() {
-  const { appointmentId } = useParams<{ appointmentId: string }>();
   const navigate = useNavigate();
   const [timeUntilStart, setTimeUntilStart] = useState<number>(0);
   const [appointment] = useState(mockAppointment);
-  const [userRole] = useState<'patient' | 'doctor'>('patient'); // Mock - vendría del auth
 
   useEffect(() => {
     // Simulamos que la cita empieza en 5 minutos
@@ -43,16 +40,9 @@ export default function SalaEspera() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const handleJoinCall = () => {
-    // Simular unirse a la llamada
-    window.open(appointment.meetLink, '_blank');
-  };
-
   const handleBackToDashboard = () => {
     navigate('/dashboard/patient');
   };
-
-  const canJoinCall = timeUntilStart <= 300; // 5 minutos antes
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
@@ -126,7 +116,7 @@ export default function SalaEspera() {
             appointmentId={appointment.id}
             meetLink={appointment.meetLink}
             isActive={timeUntilStart <= 0}
-            userRole={userRole}
+            userRole="patient"
             startTime={new Date()}
           />
         </div>
